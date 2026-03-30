@@ -221,7 +221,7 @@ function BookingWizard() {
           <div className="border-t border-outline-variant/10 my-6" />
 
           <h4 className="font-bold text-lg mb-2 text-on-surface text-center">Choisissez un horaire</h4>
-          <p className="text-sm text-on-surface-variant text-center mb-6">Durée : 10 min</p>
+          <p className="text-sm text-on-surface-variant text-center mb-6">Durée : 20 min</p>
 
           <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             {timeSlotsContent}
@@ -252,7 +252,7 @@ function BookingWizard() {
               <h3 className="text-2xl font-bold mb-4 text-on-surface">Consultation pour Création de Site Intelligent</h3>
               <div className="flex items-center gap-2 text-on-surface-variant mb-4">
                 <ScheduleIcon className="w-4 h-4" />
-                <span className="text-sm">10 min</span>
+                <span className="text-sm">20 min</span>
               </div>
               <div className="flex items-center gap-2 text-on-surface-variant">
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>

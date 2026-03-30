@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
         const startDate = parseDateAndTime(date, time);
 
         if (startDate) {
-          const endDate = new Date(startDate.getTime() + 10 * 60 * 1000); // 10 min
+          const endDate = new Date(startDate.getTime() + 20 * 60 * 1000); // 20 min
 
           const eventDescription = [
             `Téléphone: ${phone}`,
