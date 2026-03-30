@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Core palette */
+  --color-primary: #c3f5ff;
+  --color-on-primary: #00363d;
+  --color-primary-container: #00e5ff;
+  --color-on-primary-container: #00626e;
+  --color-primary-fixed: #9cf0ff;
+  --color-primary-fixed-dim: #00daf3;
+
+  /* Secondary */
+  --color-secondary: #b9c7e4;
+  --color-on-secondary: #233148;
+  --color-secondary-container: #3c4962;
+  --color-on-secondary-container: #abb9d6;
+  --color-secondary-fixed: #d6e3ff;
+  --color-secondary-fixed-dim: #b9c7e4;
+
+  /* Tertiary */
+  --color-tertiary: #f2e9ff;
+  --color-on-tertiary: #3c0090;
+  --color-tertiary-container: #d9c8ff;
+  --color-on-tertiary-container: #6c00f7;
+  --color-tertiary-fixed: #e9ddff;
+  --color-tertiary-fixed-dim: #d1bcff;
+
+  /* Error */
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+
+  /* Surface */
+  --color-surface: #0d141d;
+  --color-on-surface: #dce3f0;
+  --color-surface-dim: #0d141d;
+  --color-surface-bright: #333a44;
+  --color-surface-container-lowest: #080f18;
+  --color-surface-container-low: #151c26;
+  --color-surface-container: #19202a;
+  --color-surface-container-high: #242a34;
+  --color-surface-container-highest: #2e353f;
+  --color-surface-variant: #2e353f;
+  --color-on-surface-variant: #bac9cc;
+  --color-surface-tint: #00daf3;
+
+  /* Outline */
+  --color-outline: #849396;
+  --color-outline-variant: #3b494c;
+
+  /* Inverse */
+  --color-inverse-surface: #dce3f0;
+  --color-inverse-on-surface: #2a313b;
+  --color-inverse-primary: #006875;
+
+  /* Background */
+  --color-background: #0d141d;
+  --color-on-background: #dce3f0;
+
+  /* Fonts */
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+
+  /* Border radius */
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+/* Base styles */
+body {
+  background-color: #0d141d;
+  color: #dce3f0;
+}
+
+::selection {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #00e5ff;
+  border-radius: 10px;
+}
+
+/* Animations */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-slow-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 60s linear infinite;
+}
+
+.animate-spin-slow-reverse {
+  animation: spin-slow-reverse 40s linear infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 4s ease-in-out infinite;
+}
