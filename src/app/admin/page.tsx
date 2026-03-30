@@ -50,7 +50,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-surface flex items-center justify-center px-8">
         <div className="bg-surface-container-low rounded-[2rem] border border-outline-variant/10 shadow-2xl p-8 lg:p-12 max-w-md w-full">
           <h1 className="font-headline text-2xl font-bold mb-2 text-on-surface">
-            Admin NovaAI
+            Admin Innoft
           </h1>
           <p className="text-on-surface-variant text-sm mb-8">
             Entrez le mot de passe administrateur pour continuer.
@@ -85,7 +85,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-surface flex items-center justify-center px-8">
       <div className="bg-surface-container-low rounded-[2rem] border border-outline-variant/10 shadow-2xl p-8 lg:p-12 max-w-lg w-full">
         <h1 className="font-headline text-3xl font-bold mb-2 text-on-surface">
-          Admin NovaAI
+          Admin Innoft
         </h1>
         <p className="text-on-surface-variant mb-8">
           Connectez vos services pour activer les intégrations.

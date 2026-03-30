@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
           await calendar.events.insert({
             calendarId,
             requestBody: {
-              summary: `Consultation NovaAI — ${fullName}`,
+              summary: `Consultation Innoft — ${fullName}`,
               description: eventDescription,
               start: {
                 dateTime: startDate.toISOString(),

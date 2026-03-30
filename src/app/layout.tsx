@@ -18,7 +18,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "NovaAI - Le site web intelligent qui travaille pour vous",
+  title: "Innoft - Le site web intelligent qui travaille pour vous",
   description:
     "Un site web qui trouve vos clients, leur répond, et se met à jour — tout seul. Intelligence autonome pour votre entreprise.",
 };
@@ -31,6 +31,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`dark ${manrope.variable} ${inter.variable}`}>
       <head>
+        <link rel="icon" href="https://innoft.ma/wp-content/uploads/2024/06/produit-1024x1024.png" />
         <noscript>
           <img
             height="1"

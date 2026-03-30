@@ -430,7 +430,7 @@ function BookingWizard() {
               <input
                 name="phone"
                 className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
-                placeholder="+33 6 12 34 56 78"
+                placeholder="0661 00 00 00"
                 required
                 type="tel"
               />
@@ -539,9 +539,8 @@ export default function Home() {
       {/* ── Navigation ── */}
       <nav className="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
         <div className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto font-headline tracking-tight">
-          <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-100 bg-clip-text text-transparent">
-            NovaAI
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="https://innoft.ma/wp-content/uploads/2024/06/log-2048x2048.png" alt="Innoft" className="h-10 w-auto" />
           <div className="hidden md:flex items-center gap-8">
             <a
               className="text-slate-300 hover:text-white transition-colors"
@@ -760,11 +759,10 @@ export default function Home() {
       <footer className="bg-slate-950 border-t border-slate-800/30">
         <div className="flex flex-col md:flex-row justify-between items-center px-8 py-12 max-w-7xl mx-auto gap-6 font-body text-sm text-slate-400">
           <div className="flex flex-col items-center md:items-start gap-4">
-            <div className="text-lg font-bold text-slate-100 font-headline">
-              NovaAI
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://innoft.ma/wp-content/uploads/2024/06/log-2048x2048.png" alt="Innoft" className="h-8 w-auto" />
             <p className="max-w-xs text-center md:text-left">
-              © 2024 NovaAI. La nouvelle ère du web autonome et performant.
+              © 2026 Innoft. La nouvelle ère du web autonome et performant.
             </p>
           </div>
 

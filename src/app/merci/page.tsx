@@ -40,9 +40,9 @@ function ThankYouContent() {
         <div className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto font-headline tracking-tight">
           <a
             href="/"
-            className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-100 bg-clip-text text-transparent"
           >
-            NovaAI
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://innoft.ma/wp-content/uploads/2024/06/log-2048x2048.png" alt="Innoft" className="h-10 w-auto" />
           </a>
         </div>
       </nav>
