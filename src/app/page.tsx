@@ -315,11 +315,34 @@ function BookingWizard() {
 
           <form
             className="space-y-5"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
+              const form = e.currentTarget;
+              const formData = new FormData(form);
+
+              try {
+                await fetch("/api/leads", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    fullName: formData.get("fullName"),
+                    phone: formData.get("phone"),
+                    company: formData.get("company"),
+                    city: formData.get("city"),
+                    hasWebsite: formData.get("has_website"),
+                    timeline: formData.get("timeline"),
+                    date: selectedDateLabel || "",
+                    time: selectedTime || "",
+                  }),
+                });
+              } catch {
+                // Still redirect even if API fails
+              }
+
               if (typeof window !== "undefined" && typeof window.fbq === "function") {
                 window.fbq("track", "Lead");
               }
+
               const params = new URLSearchParams({
                 date: selectedDateLabel || "",
                 time: selectedTime || "",
@@ -333,6 +356,7 @@ function BookingWizard() {
                 Nom complet <span className="text-primary-container">*</span>
               </label>
               <input
+                name="fullName"
                 className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
                 placeholder="Votre nom complet"
                 required
@@ -346,6 +370,7 @@ function BookingWizard() {
                 Numéro de téléphone <span className="text-primary-container">*</span>
               </label>
               <input
+                name="phone"
                 className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
                 placeholder="+33 6 12 34 56 78"
                 required
@@ -359,6 +384,7 @@ function BookingWizard() {
                 Nom de l&apos;entreprise <span className="text-primary-container">*</span>
               </label>
               <input
+                name="company"
                 className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
                 placeholder="Nom de votre entreprise"
                 required
@@ -372,6 +398,7 @@ function BookingWizard() {
                 Ville <span className="text-primary-container">*</span>
               </label>
               <input
+                name="city"
                 className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
                 placeholder="Votre ville"
                 required
