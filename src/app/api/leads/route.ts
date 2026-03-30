@@ -67,6 +67,15 @@ export async function POST(req: NextRequest) {
           assigned: process.env.PERFEX_CRM_DEFAULT_ASSIGNED || "1",
         });
 
+        // Custom field: Campaign Name
+        const campaignFieldId = process.env.PERFEX_CRM_CAMPAIGN_FIELD_ID;
+        if (campaignFieldId) {
+          crmParams.append(
+            `custom_fields[leads][${campaignFieldId}]`,
+            process.env.PERFEX_CRM_CAMPAIGN_NAME || "Site Inteligent",
+          );
+        }
+
         const crmRes = await fetch(`${crmUrl}/api/leads`, {
           method: "POST",
           headers: {
