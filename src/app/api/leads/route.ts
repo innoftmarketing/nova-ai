@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { google } from "googleapis";
+import { getCalendarClient } from "@/lib/google-auth";
 
 /* ───────── Helpers ───────── */
 
-/** Parse "5 Avril 2026" + "10:30" into a JS Date (Africa/Casablanca) */
+/** Parse "5 Avril 2026" + "10:30" into a JS Date */
 function parseDateAndTime(dateStr: string, timeStr: string): Date | null {
   const MONTHS: Record<string, number> = {
     janvier: 0, février: 1, mars: 2, avril: 3, mai: 4, juin: 5,
@@ -21,24 +21,8 @@ function parseDateAndTime(dateStr: string, timeStr: string): Date | null {
   const [hours, minutes] = timeStr.split(":").map(Number);
   if (isNaN(hours) || isNaN(minutes)) return null;
 
-  // Build an ISO string in the target timezone
   const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
   return new Date(iso);
-}
-
-/** Get an authenticated Google Calendar client from a service account */
-function getCalendarClient() {
-  const credentials = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
-  if (!credentials) return null;
-
-  const key = JSON.parse(credentials);
-  const auth = new google.auth.JWT({
-    email: key.client_email,
-    key: key.private_key,
-    scopes: ["https://www.googleapis.com/auth/calendar"],
-  });
-
-  return google.calendar({ version: "v3", auth });
 }
 
 /* ───────── Route Handler ───────── */
