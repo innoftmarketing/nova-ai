@@ -1,4 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
+import { google } from "googleapis";
+
+/* ───────── Helpers ───────── */
+
+/** Parse "5 Avril 2026" + "10:30" into a JS Date (Africa/Casablanca) */
+function parseDateAndTime(dateStr: string, timeStr: string): Date | null {
+  const MONTHS: Record<string, number> = {
+    janvier: 0, février: 1, mars: 2, avril: 3, mai: 4, juin: 5,
+    juillet: 6, août: 7, septembre: 8, octobre: 9, novembre: 10, décembre: 11,
+  };
+
+  const parts = dateStr.trim().split(/\s+/);
+  if (parts.length < 3) return null;
+
+  const day = parseInt(parts[0], 10);
+  const month = MONTHS[parts[1].toLowerCase()];
+  const year = parseInt(parts[2], 10);
+  if (isNaN(day) || month === undefined || isNaN(year)) return null;
+
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  if (isNaN(hours) || isNaN(minutes)) return null;
+
+  // Build an ISO string in the target timezone
+  const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
+  return new Date(iso);
+}
+
+/** Get an authenticated Google Calendar client from a service account */
+function getCalendarClient() {
+  const credentials = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+  if (!credentials) return null;
+
+  const key = JSON.parse(credentials);
+  const auth = new google.auth.JWT({
+    email: key.client_email,
+    key: key.private_key,
+    scopes: ["https://www.googleapis.com/auth/calendar"],
+  });
+
+  return google.calendar({ version: "v3", auth });
+}
+
+/* ───────── Route Handler ───────── */
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,7 +53,7 @@ export async function POST(req: NextRequest) {
     if (!fullName || !phone) {
       return NextResponse.json(
         { error: "Nom complet et téléphone sont requis." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -60,6 +103,59 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ── Google Calendar Integration ──
+    const calendarId = process.env.GOOGLE_CALENDAR_ID;
+    const calendar = getCalendarClient();
+
+    if (calendar && calendarId && date && time) {
+      try {
+        const startDate = parseDateAndTime(date, time);
+
+        if (startDate) {
+          const endDate = new Date(startDate.getTime() + 30 * 60 * 1000); // 30 min
+
+          const eventDescription = [
+            `Téléphone: ${phone}`,
+            company ? `Entreprise: ${company}` : null,
+            city ? `Ville: ${city}` : null,
+            `Site existant: ${hasWebsite || "Non renseigné"}`,
+            `Délai: ${timeline || "Non renseigné"}`,
+          ]
+            .filter(Boolean)
+            .join("\n");
+
+          await calendar.events.insert({
+            calendarId,
+            requestBody: {
+              summary: `Consultation NovaAI — ${fullName}`,
+              description: eventDescription,
+              start: {
+                dateTime: startDate.toISOString(),
+                timeZone: "Africa/Casablanca",
+              },
+              end: {
+                dateTime: endDate.toISOString(),
+                timeZone: "Africa/Casablanca",
+              },
+              reminders: {
+                useDefault: false,
+                overrides: [
+                  { method: "email", minutes: 60 },
+                  { method: "popup", minutes: 15 },
+                ],
+              },
+            },
+          });
+        } else {
+          console.error("Google Calendar: could not parse date/time", date, time);
+          warnings.push("Calendar event not created (invalid date)");
+        }
+      } catch (err) {
+        console.error("Google Calendar error:", err);
+        warnings.push("Calendar event creation failed");
+      }
+    }
+
     // ── Google Sheets Integration (optional) ──
     const googleScriptUrl = process.env.GOOGLE_SCRIPT_URL;
 
@@ -93,7 +189,7 @@ export async function POST(req: NextRequest) {
     if (warnings.length > 0) {
       return NextResponse.json(
         { success: true, warnings },
-        { status: 207 }
+        { status: 207 },
       );
     }
 
@@ -101,7 +197,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Erreur serveur." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
