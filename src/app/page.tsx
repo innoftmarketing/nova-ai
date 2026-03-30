@@ -211,7 +211,7 @@ function BookingWizard() {
           <div className="border-t border-outline-variant/10 my-6" />
 
           <h4 className="font-bold text-lg mb-2 text-on-surface text-center">Choisissez un horaire</h4>
-          <p className="text-sm text-on-surface-variant text-center mb-6">Durée : 30 min</p>
+          <p className="text-sm text-on-surface-variant text-center mb-6">Durée : 10 min</p>
 
           <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             {timeSlotsContent}
@@ -239,32 +239,18 @@ function BookingWizard() {
           <div className="lg:w-1/3 p-8 lg:p-12 border-b lg:border-b-0 lg:border-r border-outline-variant/10 bg-surface-container">
             <div className="mb-8">
               <div className="text-primary-container font-bold text-sm tracking-widest uppercase mb-2">Consultation</div>
-              <h3 className="text-2xl font-bold mb-4 text-on-surface">Stratégie IA &amp; Croissance</h3>
+              <h3 className="text-2xl font-bold mb-4 text-on-surface">Consultation pour Création de Site Intelligent</h3>
               <div className="flex items-center gap-2 text-on-surface-variant mb-4">
                 <ScheduleIcon className="w-4 h-4" />
-                <span className="text-sm">30 min</span>
+                <span className="text-sm">10 min</span>
               </div>
               <div className="flex items-center gap-2 text-on-surface-variant">
-                <VideoCamIcon className="w-4 h-4" />
-                <span className="text-sm">Google Meet / Zoom</span>
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+                <span className="text-sm">Appel téléphonique</span>
               </div>
             </div>
             <div className="space-y-4 text-sm text-on-surface-variant leading-relaxed">
-              <p>Lors de cet appel, nous analyserons :</p>
-              <ul className="space-y-2">
-                <li className="flex items-start gap-2">
-                  <CheckCircleIcon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                  <span>Votre tunnel de vente actuel</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircleIcon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                  <span>Le potentiel d&apos;automatisation IA</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircleIcon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                  <span>Un plan d&apos;action personnalisé</span>
-                </li>
-              </ul>
+              <p>Après avoir rempli le formulaire, vous recevrez <strong className="text-on-surface">un appel téléphonique</strong> de l&apos;un de nos <strong className="text-on-surface">consultants</strong>.</p>
             </div>
           </div>
 
@@ -295,9 +281,19 @@ function BookingWizard() {
                   <div key={`blank-${i}`} className="h-10" />
                 ))}
                 {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
+                  const dateObj = new Date(currentYear, currentMonth, day);
+                  const dayOfWeek = dateObj.getDay(); // 0=Sun
+                  const isSunday = dayOfWeek === 0;
                   const isPast = isCurrentMonth && day < todayDate;
-                  const isSunday = (firstDay + day - 1) % 7 === 6;
-                  const disabled = isPast || isSunday;
+
+                  // Only allow booking 2 days ahead, except Friday: allow Sat + Mon
+                  const todayObj = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                  const diffDays = Math.floor((dateObj.getTime() - todayObj.getTime()) / (1000 * 60 * 60 * 24));
+                  const todayDow = todayObj.getDay();
+                  const maxForward = todayDow === 5 ? 3 : 2; // Friday=5 → allow 3 days (Sat+Mon)
+                  const tooFar = diffDays > maxForward;
+
+                  const disabled = isPast || isSunday || tooFar;
                   const isSelected = selectedDay === day;
                   const isToday = isCurrentMonth && day === todayDate;
 
@@ -540,7 +536,7 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
         <div className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto font-headline tracking-tight">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="https://innoft.ma/wp-content/uploads/2024/06/log-2048x2048.png" alt="Innoft" className="h-10 w-auto" />
+          <img src="https://innoft.ma/wp-content/uploads/2024/06/log-2048x2048.png" alt="Innoft" className="h-14 w-auto" />
           <div className="hidden md:flex items-center gap-8">
             <a
               className="text-slate-300 hover:text-white transition-colors"
