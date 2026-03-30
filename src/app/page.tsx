@@ -144,12 +144,16 @@ function BookingWizard() {
     ? DAY_NAMES[new Date(currentYear, currentMonth, selectedDay).getDay()]
     : null;
 
+  function scrollToContact() {
+    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function handleDayClick(day: number) {
     setSelectedDay(day);
     setSelectedTime(null);
-    // On mobile, go to timeslots screen. On desktop, timeslots show inline.
     if (window.innerWidth < 768) {
       setStep("timeslots");
+      setTimeout(scrollToContact, 50);
     }
   }
 
@@ -173,7 +177,7 @@ function BookingWizard() {
             </button>
             {isSelected && (
               <button
-                onClick={() => setStep("form")}
+                onClick={() => { setStep("form"); setTimeout(scrollToContact, 50); }}
                 className="px-5 py-3 bg-gradient-to-r from-primary-container to-primary text-on-primary rounded-xl font-bold text-sm hover:shadow-[0_0_20px_rgba(0,229,255,0.3)] active:scale-95 transition-all"
               >
                 Suivant
@@ -193,7 +197,7 @@ function BookingWizard() {
           {/* Back + date header */}
           <div className="flex items-center gap-4 mb-2">
             <button
-              onClick={() => { setStep("calendar"); setSelectedTime(null); }}
+              onClick={() => { setStep("calendar"); setSelectedTime(null); setTimeout(scrollToContact, 50); }}
               className="p-1 hover:bg-white/5 rounded-full transition-colors"
             >
               <ChevronLeftIcon className="w-5 h-5 text-on-surface" />
@@ -344,7 +348,7 @@ function BookingWizard() {
         <div className="bg-surface-container-low rounded-[2.5rem] border border-outline-variant/10 shadow-2xl p-8 lg:p-12">
           {/* Back + selected date */}
           <button
-            onClick={() => setStep(typeof window !== "undefined" && window.innerWidth < 768 ? "timeslots" : "calendar")}
+            onClick={() => { setStep(typeof window !== "undefined" && window.innerWidth < 768 ? "timeslots" : "calendar"); setTimeout(scrollToContact, 50); }}
             className="flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-6"
           >
             <ChevronLeftIcon className="w-4 h-4" />
