@@ -97,6 +97,7 @@ const MONTH_NAMES = [
   "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
 ];
 const DAYS_HEADER = ["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"];
+const DAY_NAMES = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
 const TIME_SLOTS = ["09:00", "10:30", "11:00", "13:30", "15:00", "16:30", "17:00"];
 
 function getDaysInMonth(year: number, month: number) {
@@ -116,7 +117,8 @@ function BookingWizard() {
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  // "calendar" | "timeslots" | "form"
+  const [step, setStep] = useState<"calendar" | "timeslots" | "form">("calendar");
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
@@ -138,8 +140,85 @@ function BookingWizard() {
     ? `${selectedDay} ${MONTH_NAMES[currentMonth]} ${currentYear}`
     : null;
 
-  /* ── Step 1: Calendar + Time ── */
-  if (step === 1) {
+  const selectedDayName = selectedDay
+    ? DAY_NAMES[new Date(currentYear, currentMonth, selectedDay).getDay()]
+    : null;
+
+  function handleDayClick(day: number) {
+    setSelectedDay(day);
+    setSelectedTime(null);
+    // On mobile, go to timeslots screen. On desktop, timeslots show inline.
+    if (window.innerWidth < 768) {
+      setStep("timeslots");
+    }
+  }
+
+  /* ── Time Slots List (shared between mobile & desktop) ── */
+  const timeSlotsContent = (
+    <div className="space-y-3">
+      {TIME_SLOTS.map((time) => {
+        const isSelected = selectedTime === time;
+        return (
+          <div key={time} className="flex gap-2 items-center">
+            <button
+              onClick={() => setSelectedTime(time)}
+              className={`flex-1 py-3 rounded-xl font-medium transition-all border text-sm
+                ${isSelected
+                  ? "bg-surface-container-highest border-primary/40 text-primary"
+                  : "border-outline-variant/20 text-on-surface hover:border-primary/40 hover:text-primary"
+                }
+              `}
+            >
+              {time}
+            </button>
+            {isSelected && (
+              <button
+                onClick={() => setStep("form")}
+                className="px-5 py-3 bg-gradient-to-r from-primary-container to-primary text-on-primary rounded-xl font-bold text-sm hover:shadow-[0_0_20px_rgba(0,229,255,0.3)] active:scale-95 transition-all"
+              >
+                Suivant
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  /* ── Mobile: Time Slots Full Screen ── */
+  if (step === "timeslots") {
+    return (
+      <div className="max-w-lg mx-auto relative z-10">
+        <div className="bg-surface-container-low rounded-[2.5rem] border border-outline-variant/10 shadow-2xl p-8">
+          {/* Back + date header */}
+          <div className="flex items-center gap-4 mb-2">
+            <button
+              onClick={() => { setStep("calendar"); setSelectedTime(null); }}
+              className="p-1 hover:bg-white/5 rounded-full transition-colors"
+            >
+              <ChevronLeftIcon className="w-5 h-5 text-on-surface" />
+            </button>
+            <div className="text-center flex-1">
+              <h3 className="font-headline text-xl font-bold text-on-surface capitalize">{selectedDayName}</h3>
+              <p className="text-sm text-on-surface-variant">{selectedDateLabel}</p>
+            </div>
+          </div>
+
+          <div className="border-t border-outline-variant/10 my-6" />
+
+          <h4 className="font-bold text-lg mb-2 text-on-surface text-center">Choisissez un horaire</h4>
+          <p className="text-sm text-on-surface-variant text-center mb-6">Durée : 30 min</p>
+
+          <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            {timeSlotsContent}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Step 1: Calendar (+ time slots on desktop) ── */
+  if (step === "calendar") {
     return (
       <div className="max-w-5xl mx-auto relative z-10">
         <div className="text-center mb-16">
@@ -185,7 +264,7 @@ function BookingWizard() {
             </div>
           </div>
 
-          {/* Calendar + Time */}
+          {/* Calendar + Time (desktop: side-by-side, mobile: calendar only) */}
           <div className="flex-1 flex flex-col md:flex-row bg-surface-container-low">
             {/* Calendar */}
             <div className="flex-1 p-8">
@@ -222,7 +301,7 @@ function BookingWizard() {
                     <button
                       key={day}
                       disabled={disabled}
-                      onClick={() => setSelectedDay(day)}
+                      onClick={() => handleDayClick(day)}
                       className={`h-10 w-10 mx-auto flex items-center justify-center rounded-full transition-all text-sm
                         ${disabled ? "opacity-20 cursor-not-allowed text-on-surface-variant" : ""}
                         ${isSelected ? "bg-primary text-on-primary font-bold shadow-[0_0_15px_rgba(0,229,255,0.3)]" : ""}
@@ -237,38 +316,13 @@ function BookingWizard() {
               </div>
             </div>
 
-            {/* Time Slots */}
-            <div className="md:w-72 p-8 border-t md:border-t-0 md:border-l border-outline-variant/10">
+            {/* Time Slots — desktop only */}
+            <div className="hidden md:block md:w-72 p-8 border-l border-outline-variant/10">
               {selectedDay ? (
                 <>
                   <h4 className="font-bold text-lg mb-8 text-on-surface">Heure</h4>
-                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                    {TIME_SLOTS.map((time) => {
-                      const isSelected = selectedTime === time;
-                      return (
-                        <div key={time} className="flex gap-2 items-center">
-                          <button
-                            onClick={() => setSelectedTime(time)}
-                            className={`flex-1 py-3 rounded-xl font-medium transition-all border text-sm
-                              ${isSelected
-                                ? "bg-surface-container-highest border-primary/40 text-primary"
-                                : "border-outline-variant/20 text-on-surface hover:border-primary/40 hover:text-primary"
-                              }
-                            `}
-                          >
-                            {time}
-                          </button>
-                          {isSelected && (
-                            <button
-                              onClick={() => setStep(2)}
-                              className="px-5 py-3 bg-gradient-to-r from-primary-container to-primary text-on-primary rounded-xl font-bold text-sm hover:shadow-[0_0_20px_rgba(0,229,255,0.3)] active:scale-95 transition-all"
-                            >
-                              Suivant
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
+                  <div className="max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {timeSlotsContent}
                   </div>
                 </>
               ) : (
@@ -283,14 +337,14 @@ function BookingWizard() {
     );
   }
 
-  /* ── Step 2: Form ── */
-  if (step === 2) {
+  /* ── Step: Form ── */
+  if (step === "form") {
     return (
       <div className="max-w-2xl mx-auto relative z-10">
         <div className="bg-surface-container-low rounded-[2.5rem] border border-outline-variant/10 shadow-2xl p-8 lg:p-12">
           {/* Back + selected date */}
           <button
-            onClick={() => setStep(1)}
+            onClick={() => setStep(typeof window !== "undefined" && window.innerWidth < 768 ? "timeslots" : "calendar")}
             className="flex items-center gap-1 text-sm text-on-surface-variant hover:text-primary transition-colors mb-6"
           >
             <ChevronLeftIcon className="w-4 h-4" />
