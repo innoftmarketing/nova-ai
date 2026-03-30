@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     if (crmUrl && crmToken) {
       try {
         const description = [
-          `Lead depuis NovaAI Landing Page`,
+          `Lead from Site Inteligent campaign`,
           `Ville: ${city || "Non renseigné"}`,
           `Site existant: ${hasWebsite || "Non renseigné"}`,
           `Délai projet: ${timeline || "Non renseigné"}`,
@@ -66,15 +66,6 @@ export async function POST(req: NextRequest) {
           source: process.env.PERFEX_CRM_DEFAULT_SOURCE || "1",
           assigned: process.env.PERFEX_CRM_DEFAULT_ASSIGNED || "1",
         });
-
-        // Custom field: Campaign Name
-        const campaignFieldId = process.env.PERFEX_CRM_CAMPAIGN_FIELD_ID;
-        if (campaignFieldId) {
-          crmParams.append(
-            `custom_fields[leads][${campaignFieldId}]`,
-            process.env.PERFEX_CRM_CAMPAIGN_NAME || "Site Inteligent",
-          );
-        }
 
         const crmRes = await fetch(`${crmUrl}/api/leads`, {
           method: "POST",
