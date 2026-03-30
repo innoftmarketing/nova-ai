@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOAuth2Client } from "@/lib/google-auth";
+import { verifyAdminToken } from "@/lib/admin-auth";
 
 export async function GET(req: NextRequest) {
+  const isAdmin = await verifyAdminToken();
+  if (!isAdmin) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+
   const code = req.nextUrl.searchParams.get("code");
 
   if (!code) {
