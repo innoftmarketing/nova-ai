@@ -136,6 +136,7 @@ function BookingWizard() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   // "calendar" | "timeslots" | "form"
   const [step, setStep] = useState<"calendar" | "timeslots" | "form">("calendar");
+  const [submitting, setSubmitting] = useState(false);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
@@ -408,6 +409,9 @@ function BookingWizard() {
             className="space-y-5"
             onSubmit={async (e) => {
               e.preventDefault();
+              if (submitting) return;
+              setSubmitting(true);
+
               const form = e.currentTarget;
               const formData = new FormData(form);
 
@@ -548,9 +552,10 @@ function BookingWizard() {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full py-5 mt-4 bg-gradient-to-r from-primary-container to-primary text-on-primary font-bold rounded-2xl text-xl hover:shadow-[0_10px_40px_rgba(0,229,255,0.4)] hover:scale-[1.01] active:scale-95 transition-all"
+              disabled={submitting}
+              className={`w-full py-5 mt-4 bg-gradient-to-r from-primary-container to-primary text-on-primary font-bold rounded-2xl text-xl transition-all ${submitting ? "opacity-60 cursor-not-allowed" : "hover:shadow-[0_10px_40px_rgba(0,229,255,0.4)] hover:scale-[1.01] active:scale-95"}`}
             >
-              Envoyer ma demande
+              {submitting ? "Envoi en cours..." : "Envoyer ma demande"}
             </button>
             <p className="text-center text-xs text-on-surface-variant/60">
               En envoyant ce formulaire, vous acceptez notre politique de confidentialité.
