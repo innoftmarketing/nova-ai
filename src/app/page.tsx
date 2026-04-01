@@ -423,6 +423,7 @@ function BookingWizard() {
                     fullName: formData.get("fullName"),
                     phone: formData.get("phone"),
                     company: formData.get("company"),
+                    companyDescription: formData.get("companyDescription"),
                     city: formData.get("city"),
                     hasWebsite: formData.get("has_website"),
                     timeline: formData.get("timeline"),
@@ -484,6 +485,21 @@ function BookingWizard() {
                 placeholder="Nom de votre entreprise"
                 required
                 type="text"
+              />
+            </div>
+
+            {/* Description de l'entreprise */}
+            <div>
+              <label className="block text-sm font-medium text-on-surface-variant mb-2">
+                Décrivez brièvement votre activité <span className="text-primary-container">*</span>
+              </label>
+              <textarea
+                name="companyDescription"
+                className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none resize-none"
+                placeholder="Ex : Nous sommes un salon de coiffure à Casablanca, nous cherchons à attirer plus de clients en ligne..."
+                required
+                rows={3}
+                minLength={50}
               />
             </div>
 

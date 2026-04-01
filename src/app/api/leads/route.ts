@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { fullName, phone, company, city, hasWebsite, timeline, date, time } =
+    const { fullName, phone, company, companyDescription, city, hasWebsite, timeline, date, time } =
       body;
 
     if (!fullName || !phone) {
@@ -51,11 +51,12 @@ export async function POST(req: NextRequest) {
       try {
         const description = [
           `Lead from Site Inteligent campaign`,
+          companyDescription ? `Description: ${companyDescription}` : null,
           `Ville: ${city || "Non renseigné"}`,
           `Site existant: ${hasWebsite || "Non renseigné"}`,
           `Délai projet: ${timeline || "Non renseigné"}`,
           `Créneau choisi: ${date || "—"} à ${time || "—"}`,
-        ].join("\n");
+        ].filter(Boolean).join("\n");
 
         const crmParams = new URLSearchParams({
           name: fullName,
@@ -101,6 +102,7 @@ export async function POST(req: NextRequest) {
           const eventDescription = [
             `Téléphone: ${phone}`,
             company ? `Entreprise: ${company}` : null,
+            companyDescription ? `Description: ${companyDescription}` : null,
             city ? `Ville: ${city}` : null,
             `Site existant: ${hasWebsite || "Non renseigné"}`,
             `Délai: ${timeline || "Non renseigné"}`,
@@ -156,6 +158,7 @@ export async function POST(req: NextRequest) {
             fullName,
             phone,
             company: company || "",
+            companyDescription: companyDescription || "",
             city: city || "",
             hasWebsite: hasWebsite || "",
             timeline: timeline || "",
