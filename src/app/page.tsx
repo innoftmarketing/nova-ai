@@ -99,7 +99,6 @@ const MONTH_NAMES = [
 const DAYS_HEADER = ["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"];
 const DAY_NAMES = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
 const TIME_SLOTS = [
-  "09:00", "09:15", "09:30", "09:45",
   "10:00", "10:15", "10:30", "10:45",
   "11:00", "11:15", "11:30", "11:45",
   "12:00", "12:15", "12:30", "12:45",
@@ -107,8 +106,16 @@ const TIME_SLOTS = [
   "14:00", "14:15", "14:30", "14:45",
   "15:00", "15:15", "15:30", "15:45",
   "16:00", "16:15", "16:30", "16:45",
-  "17:00",
+  "17:00", "17:15", "17:30",
 ];
+
+function getNowInMorocco(): Date {
+  const utc = new Date();
+  const moroccoOffset = 1 * 60; // GMT+1 in minutes
+  const localOffset = utc.getTimezoneOffset(); // negative for east of UTC
+  const diff = moroccoOffset + localOffset; // minutes to add
+  return new Date(utc.getTime() + diff * 60 * 1000);
+}
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -122,7 +129,7 @@ function getFirstDayOfMonth(year: number, month: number) {
 /* ───────── Booking Wizard ───────── */
 function BookingWizard() {
   const router = useRouter();
-  const today = new Date();
+  const today = getNowInMorocco();
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -134,6 +141,9 @@ function BookingWizard() {
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
   const todayDate = today.getDate();
   const isCurrentMonth = currentMonth === today.getMonth() && currentYear === today.getFullYear();
+
+  // Check if selected day is today (in Morocco time) to filter past slots
+  const isSelectedDayToday = selectedDay !== null && isCurrentMonth && selectedDay === todayDate;
 
   function prevMonth() {
     if (isCurrentMonth) return;
@@ -168,34 +178,51 @@ function BookingWizard() {
   }
 
   /* ── Time Slots List (shared between mobile & desktop) ── */
+  const now = getNowInMorocco();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+
+  const availableSlots = isSelectedDayToday
+    ? TIME_SLOTS.filter((time) => {
+        const [h, m] = time.split(":").map(Number);
+        return h > currentHour || (h === currentHour && m > currentMinute);
+      })
+    : TIME_SLOTS;
+
   const timeSlotsContent = (
     <div className="space-y-3">
-      {TIME_SLOTS.map((time) => {
-        const isSelected = selectedTime === time;
-        return (
-          <div key={time} className="flex gap-2 items-center">
-            <button
-              onClick={() => setSelectedTime(time)}
-              className={`flex-1 py-3 rounded-xl font-medium transition-all border text-sm
-                ${isSelected
-                  ? "bg-surface-container-highest border-primary/40 text-primary"
-                  : "border-outline-variant/20 text-on-surface hover:border-primary/40 hover:text-primary"
-                }
-              `}
-            >
-              {time}
-            </button>
-            {isSelected && (
+      {availableSlots.length === 0 ? (
+        <p className="text-on-surface-variant text-sm text-center py-4">
+          Plus de créneaux disponibles aujourd&apos;hui. Veuillez sélectionner un autre jour.
+        </p>
+      ) : (
+        availableSlots.map((time) => {
+          const isSelected = selectedTime === time;
+          return (
+            <div key={time} className="flex gap-2 items-center">
               <button
-                onClick={() => { setStep("form"); setTimeout(scrollToContact, 50); }}
-                className="px-5 py-3 bg-gradient-to-r from-primary-container to-primary text-on-primary rounded-xl font-bold text-sm hover:shadow-[0_0_20px_rgba(0,229,255,0.3)] active:scale-95 transition-all"
+                onClick={() => setSelectedTime(time)}
+                className={`flex-1 py-3 rounded-xl font-medium transition-all border text-sm
+                  ${isSelected
+                    ? "bg-surface-container-highest border-primary/40 text-primary"
+                    : "border-outline-variant/20 text-on-surface hover:border-primary/40 hover:text-primary"
+                  }
+                `}
               >
-                Suivant
+                {time}
               </button>
-            )}
-          </div>
-        );
-      })}
+              {isSelected && (
+                <button
+                  onClick={() => { setStep("form"); setTimeout(scrollToContact, 50); }}
+                  className="px-5 py-3 bg-gradient-to-r from-primary-container to-primary text-on-primary rounded-xl font-bold text-sm hover:shadow-[0_0_20px_rgba(0,229,255,0.3)] active:scale-95 transition-all"
+                >
+                  Suivant
+                </button>
+              )}
+            </div>
+          );
+        })
+      )}
     </div>
   );
 
