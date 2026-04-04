@@ -146,6 +146,11 @@ function BookingWizard() {
   // Check if selected day is today (in Morocco time) to filter past slots
   const isSelectedDayToday = selectedDay !== null && isCurrentMonth && selectedDay === todayDate;
 
+  // Check if selected day is Saturday (6) to limit slots to 13:00
+  const isSelectedDaySaturday = selectedDay !== null
+    ? new Date(currentYear, currentMonth, selectedDay).getDay() === 6
+    : false;
+
   function prevMonth() {
     if (isCurrentMonth) return;
     if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear(currentYear - 1); }
@@ -183,12 +188,13 @@ function BookingWizard() {
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
 
-  const availableSlots = isSelectedDayToday
-    ? TIME_SLOTS.filter((time) => {
-        const [h, m] = time.split(":").map(Number);
-        return h > currentHour || (h === currentHour && m > currentMinute);
-      })
-    : TIME_SLOTS;
+  const saturdayCutoff = 13; // Saturday: last slot at 13:00
+  const availableSlots = TIME_SLOTS.filter((time) => {
+    const [h, m] = time.split(":").map(Number);
+    if (isSelectedDayToday && !(h > currentHour || (h === currentHour && m > currentMinute))) return false;
+    if (isSelectedDaySaturday && h >= saturdayCutoff) return false;
+    return true;
+  });
 
   const timeSlotsContent = (
     <div className="space-y-3">
