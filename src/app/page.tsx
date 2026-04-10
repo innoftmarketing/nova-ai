@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 /* ───────── Icon Components ───────── */
@@ -129,6 +129,7 @@ function getFirstDayOfMonth(year: number, month: number) {
 /* ───────── Booking Wizard ───────── */
 function BookingWizard() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const today = getNowInMorocco();
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
@@ -137,6 +138,8 @@ function BookingWizard() {
   // "calendar" | "timeslots" | "form"
   const [step, setStep] = useState<"calendar" | "timeslots" | "form">("calendar");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
@@ -233,6 +236,28 @@ function BookingWizard() {
     </div>
   );
 
+  /* ── Loading skeleton until client-side hydration completes ── */
+  if (!mounted) {
+    return (
+      <div className="max-w-5xl mx-auto relative z-10">
+        <div className="text-center mb-16">
+          <h2 className="font-headline text-4xl lg:text-5xl font-bold mb-4 text-on-surface">
+            Passez au site intelligent.
+          </h2>
+          <p className="text-on-surface-variant text-lg">
+            Choisissez un créneau. Un consultant vous contacte pour en discuter.
+          </p>
+        </div>
+        <div className="bg-surface-container-low rounded-[2.5rem] border border-outline-variant/10 shadow-2xl overflow-hidden min-h-[650px] flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-on-surface-variant text-sm">Chargement du calendrier...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   /* ── Mobile: Time Slots Full Screen ── */
   if (step === "timeslots") {
     return (
@@ -328,6 +353,7 @@ function BookingWizard() {
                   const dateObj = new Date(currentYear, currentMonth, day);
                   const dayOfWeek = dateObj.getDay(); // 0=Sun
                   const isSunday = dayOfWeek === 0;
+                  const isSaturday = dayOfWeek === 6;
                   const isPast = isCurrentMonth && day < todayDate;
 
                   // Only allow booking 2 days ahead, except Friday: allow Sat + Mon
@@ -337,7 +363,14 @@ function BookingWizard() {
                   const maxForward = todayDow === 5 ? 3 : 2; // Friday=5 → allow 3 days (Sat+Mon)
                   const tooFar = diffDays > maxForward;
 
-                  const disabled = isPast || isSunday || tooFar;
+                  // Disable today if all time slots have already passed
+                  const isTodayNoSlots = isCurrentMonth && day === todayDate && (() => {
+                    const lastSlotH = isSaturday ? 12 : 17;
+                    const lastSlotM = isSaturday ? 45 : 30;
+                    return currentHour > lastSlotH || (currentHour === lastSlotH && currentMinute >= lastSlotM);
+                  })();
+
+                  const disabled = isPast || isSunday || tooFar || isTodayNoSlots;
                   const isSelected = selectedDay === day;
                   const isToday = isCurrentMonth && day === todayDate;
 
@@ -347,10 +380,10 @@ function BookingWizard() {
                       disabled={disabled}
                       onClick={() => handleDayClick(day)}
                       className={`h-10 w-10 mx-auto flex items-center justify-center rounded-full transition-all text-sm
-                        ${disabled ? "opacity-20 cursor-not-allowed text-on-surface-variant" : ""}
+                        ${disabled ? "opacity-20 cursor-not-allowed text-on-surface-variant pointer-events-none" : "cursor-pointer"}
                         ${isSelected ? "bg-primary text-on-primary font-bold shadow-[0_0_15px_rgba(0,229,255,0.3)]" : ""}
-                        ${!disabled && !isSelected && isToday ? "text-primary border border-primary/20 hover:bg-primary-container/20" : ""}
-                        ${!disabled && !isSelected && !isToday ? "hover:bg-primary-container/20 hover:text-primary text-on-surface" : ""}
+                        ${!disabled && !isSelected && isToday ? "text-primary font-semibold border border-primary/40 bg-primary/10 hover:bg-primary/20" : ""}
+                        ${!disabled && !isSelected && !isToday ? "text-on-surface font-medium bg-surface-container-high/60 hover:bg-primary-container/30 hover:text-primary" : ""}
                       `}
                     >
                       {day}
@@ -810,8 +843,8 @@ export default function Home() {
           <BookingWizard />
 
           {/* Decorative orbs */}
-          <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 blur-[120px] rounded-full -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-tertiary/5 blur-[120px] rounded-full translate-x-1/2 translate-y-1/2" />
+          <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 blur-[120px] rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-tertiary/5 blur-[120px] rounded-full translate-x-1/2 translate-y-1/2 pointer-events-none" />
         </section>
       </main>
 
