@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { fullName, phone, company, companyDescription, city, hasWebsite, timeline, date, time } =
+    const { fullName, phone, email, company, companyDescription, city, hasWebsite, timeline, date, time } =
       body;
 
     if (!fullName || !phone) {
@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
         const crmParams = new URLSearchParams({
           name: fullName,
           phonenumber: phone,
+          email: email || "",
           company: company || "",
           description,
           status: process.env.PERFEX_CRM_DEFAULT_STATUS || "1",
@@ -101,6 +102,7 @@ export async function POST(req: NextRequest) {
 
           const eventDescription = [
             `Téléphone: ${phone}`,
+            email ? `Email: ${email}` : null,
             company ? `Entreprise: ${company}` : null,
             companyDescription ? `Description: ${companyDescription}` : null,
             city ? `Ville: ${city}` : null,
@@ -157,6 +159,7 @@ export async function POST(req: NextRequest) {
           body: JSON.stringify({
             fullName,
             phone,
+            email: email || "",
             company: company || "",
             companyDescription: companyDescription || "",
             city: city || "",

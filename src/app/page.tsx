@@ -461,6 +461,7 @@ function BookingWizard() {
                   body: JSON.stringify({
                     fullName: formData.get("fullName"),
                     phone: formData.get("phone"),
+                    email: formData.get("email"),
                     company: formData.get("company"),
                     companyDescription: formData.get("companyDescription"),
                     city: formData.get("city"),
@@ -510,6 +511,20 @@ function BookingWizard() {
                 placeholder="0661 00 00 00"
                 required
                 type="tel"
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-on-surface-variant mb-2">
+                Adresse email <span className="text-primary-container">*</span>
+              </label>
+              <input
+                name="email"
+                className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
+                placeholder="votre@email.com"
+                required
+                type="email"
               />
             </div>
 
