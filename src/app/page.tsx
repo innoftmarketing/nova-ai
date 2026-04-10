@@ -619,6 +619,19 @@ function BookingWizard() {
               </div>
             </fieldset>
 
+            {/* Confirmation checkbox */}
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                name="confirm_rdv"
+                required
+                className="mt-1 h-5 w-5 rounded border-outline-variant/20 bg-surface-container text-primary focus:ring-primary accent-primary cursor-pointer shrink-0"
+              />
+              <span className="text-sm text-on-surface-variant leading-relaxed">
+                Je confirme que je recevrai un appel d&apos;un consultant et je serai au rendez-vous <span className="text-on-surface font-medium">(INCHAALLAH)</span>
+              </span>
+            </label>
+
             {/* Submit */}
             <button
               type="submit"
