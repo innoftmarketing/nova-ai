@@ -31,8 +31,10 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { fullName, phone, email, company, companyDescription, city, hasWebsite, timeline, date, time } =
-      body;
+    const {
+      fullName, phone, email, company, companyDescription, city, hasWebsite, timeline, date, time,
+      utm_source, utm_medium, utm_campaign, utm_content,
+    } = body;
 
     if (!fullName || !phone) {
       return NextResponse.json(
@@ -43,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     const warnings: string[] = [];
 
-    // ── Perfect CRM Integration ──
+    // ── Perfex CRM Integration ──
     const crmUrl = process.env.PERFEX_CRM_URL;
     const crmToken = process.env.PERFEX_CRM_API_TOKEN;
 
@@ -56,6 +58,9 @@ export async function POST(req: NextRequest) {
           `Site existant: ${hasWebsite || "Non renseigné"}`,
           `Délai projet: ${timeline || "Non renseigné"}`,
           `Créneau choisi: ${date || "—"} à ${time || "—"}`,
+          (utm_source || utm_medium || utm_campaign || utm_content)
+            ? `\n— Campagne Meta —\nSource: ${utm_source || "—"}\nAdset: ${utm_medium || "—"}\nCampagne: ${utm_campaign || "—"}\nAnnonce: ${utm_content || "—"}`
+            : null,
         ].filter(Boolean).join("\n");
 
         const crmParams = new URLSearchParams({
@@ -68,6 +73,16 @@ export async function POST(req: NextRequest) {
           source: process.env.PERFEX_CRM_DEFAULT_SOURCE || "1",
           assigned: process.env.PERFEX_CRM_DEFAULT_ASSIGNED || "1",
         });
+
+        // UTM custom fields (Perfex Lead object)
+        //   25 = leads_source        → utm_source
+        //   17 = leads_campaign_name → utm_campaign
+        //   19 = leads_ad_set_name_2 → utm_medium (adset)
+        //   18 = leads_ad_set_name   → utm_content (ad name)
+        if (utm_source) crmParams.append("custom_fields[leads][25]", utm_source);
+        if (utm_campaign) crmParams.append("custom_fields[leads][17]", utm_campaign);
+        if (utm_medium) crmParams.append("custom_fields[leads][19]", utm_medium);
+        if (utm_content) crmParams.append("custom_fields[leads][18]", utm_content);
 
         const crmRes = await fetch(`${crmUrl}/api/leads`, {
           method: "POST",
@@ -108,6 +123,9 @@ export async function POST(req: NextRequest) {
             city ? `Ville: ${city}` : null,
             `Site existant: ${hasWebsite || "Non renseigné"}`,
             `Délai: ${timeline || "Non renseigné"}`,
+            (utm_source || utm_medium || utm_campaign || utm_content)
+              ? `\n— Campagne Meta —\nSource: ${utm_source || "—"}\nAdset: ${utm_medium || "—"}\nCampagne: ${utm_campaign || "—"}\nAnnonce: ${utm_content || "—"}`
+              : null,
           ]
             .filter(Boolean)
             .join("\n");
@@ -167,6 +185,10 @@ export async function POST(req: NextRequest) {
             timeline: timeline || "",
             date: date || "",
             time: time || "",
+            utm_source: utm_source || "",
+            utm_medium: utm_medium || "",
+            utm_campaign: utm_campaign || "",
+            utm_content: utm_content || "",
             timestamp,
           }),
         });

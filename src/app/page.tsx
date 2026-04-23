@@ -126,6 +126,49 @@ function getFirstDayOfMonth(year: number, month: number) {
   return day === 0 ? 6 : day - 1; // Monday = 0
 }
 
+/* ───────── UTM helpers ───────── */
+const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content"] as const;
+type UtmMap = Partial<Record<(typeof UTM_KEYS)[number], string>>;
+
+function captureUtmsFromUrl() {
+  if (typeof window === "undefined") return;
+  const params = new URLSearchParams(window.location.search);
+  const utms: UtmMap = {};
+  let hasAny = false;
+  UTM_KEYS.forEach((k) => {
+    const v = params.get(k);
+    if (v) {
+      utms[k] = v;
+      hasAny = true;
+    }
+  });
+  if (!hasAny) return;
+  try {
+    sessionStorage.setItem("innoft_utms", JSON.stringify(utms));
+    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = `innoft_utms=${encodeURIComponent(JSON.stringify(utms))};expires=${expires};path=/;SameSite=Lax`;
+  } catch {
+    // storage blocked — silent
+  }
+}
+
+function getStoredUtms(): UtmMap {
+  if (typeof window === "undefined") return {};
+  try {
+    const session = sessionStorage.getItem("innoft_utms");
+    if (session) return JSON.parse(session) as UtmMap;
+  } catch {
+    // ignore
+  }
+  try {
+    const match = document.cookie.match(/(?:^|; )innoft_utms=([^;]+)/);
+    if (match) return JSON.parse(decodeURIComponent(match[1])) as UtmMap;
+  } catch {
+    // ignore
+  }
+  return {};
+}
+
 /* ───────── Booking Wizard ───────── */
 function BookingWizard() {
   const router = useRouter();
@@ -140,6 +183,7 @@ function BookingWizard() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
+  useEffect(() => { captureUtmsFromUrl(); }, []);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
@@ -453,6 +497,7 @@ function BookingWizard() {
 
               const form = e.currentTarget;
               const formData = new FormData(form);
+              const utms = getStoredUtms();
 
               try {
                 await fetch("/api/leads", {
@@ -469,6 +514,10 @@ function BookingWizard() {
                     timeline: formData.get("timeline"),
                     date: selectedDateLabel || "",
                     time: selectedTime || "",
+                    utm_source: utms.utm_source || "",
+                    utm_medium: utms.utm_medium || "",
+                    utm_campaign: utms.utm_campaign || "",
+                    utm_content: utms.utm_content || "",
                   }),
                 });
               } catch {
