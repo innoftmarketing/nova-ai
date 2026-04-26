@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCalendarClient } from "@/lib/google-auth";
+import { sendCAPIEvent } from "@/lib/meta-capi";
 
 /* ───────── Helpers ───────── */
 
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
     const {
       fullName, phone, email, company, companyDescription, city, hasWebsite, timeline, date, time,
       utm_source, utm_medium, utm_campaign, utm_content,
+      eventId, sourceUrl,
     } = body;
 
     if (!fullName || !phone) {
@@ -196,6 +198,40 @@ export async function POST(req: NextRequest) {
         console.error("Google Sheets error:", err);
         warnings.push("Google Sheets submission failed");
       }
+    }
+
+    // ── Meta Conversions API (server-side Lead event) ──
+    try {
+      const fbc = req.cookies.get("_fbc")?.value;
+      const fbp = req.cookies.get("_fbp")?.value;
+      const userAgent = req.headers.get("user-agent") ?? undefined;
+      const xff = req.headers.get("x-forwarded-for");
+      const clientIp =
+        xff?.split(",")[0].trim() ||
+        req.headers.get("x-real-ip") ||
+        undefined;
+
+      const capiResult = await sendCAPIEvent({
+        eventName: "Lead",
+        eventId,
+        eventSourceUrl: sourceUrl,
+        email,
+        phone,
+        fullName,
+        city,
+        country: "ma",
+        clientIp,
+        clientUserAgent: userAgent,
+        fbc,
+        fbp,
+      });
+
+      if (!capiResult.ok) {
+        warnings.push("Meta CAPI lead event failed");
+      }
+    } catch (err) {
+      console.error("Meta CAPI send failed:", err);
+      warnings.push("Meta CAPI lead event failed");
     }
 
     if (warnings.length > 0) {

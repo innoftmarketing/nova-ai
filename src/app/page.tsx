@@ -499,6 +499,13 @@ function BookingWizard() {
               const formData = new FormData(form);
               const utms = getStoredUtms();
 
+              const eventId =
+                typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+                  ? crypto.randomUUID()
+                  : `evt_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+              const sourceUrl =
+                typeof window !== "undefined" ? window.location.href : "";
+
               try {
                 await fetch("/api/leads", {
                   method: "POST",
@@ -518,6 +525,8 @@ function BookingWizard() {
                     utm_medium: utms.utm_medium || "",
                     utm_campaign: utms.utm_campaign || "",
                     utm_content: utms.utm_content || "",
+                    eventId,
+                    sourceUrl,
                   }),
                 });
               } catch {
@@ -525,7 +534,7 @@ function BookingWizard() {
               }
 
               if (typeof window !== "undefined" && typeof window.fbq === "function") {
-                window.fbq("track", "Lead");
+                window.fbq("track", "Lead", {}, { eventID: eventId });
               }
 
               const params = new URLSearchParams({
