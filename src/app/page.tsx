@@ -532,7 +532,7 @@ function BookingWizard() {
                 date: selectedDateLabel || "",
                 time: selectedTime || "",
               });
-              router.push(`/merci?${params.toString()}`);
+              router.push(`/merci-fr?${params.toString()}`);
             }}
           >
             {/* Nom complet */}
