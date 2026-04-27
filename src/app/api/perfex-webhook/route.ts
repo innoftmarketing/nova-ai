@@ -28,11 +28,24 @@ type WebhookPayload = {
   event?: string;
   webhook_id?: number;
   fired_at?: string;
-  data?: {
-    id?: string | number;
-    new_status?: string | number;
-  } & Record<string, unknown>;
+  data?: Record<string, unknown>;
 };
+
+function extractLeadId(payload: WebhookPayload): string | undefined {
+  const data = payload.data;
+  if (!data) return undefined;
+  const candidates: unknown[] = [
+    (data.id as Record<string, unknown> | undefined)?.lead_id,
+    (data.id as Record<string, unknown> | undefined)?.leadid,
+    typeof data.id === "string" || typeof data.id === "number" ? data.id : undefined,
+    data.lead_id,
+    data.leadid,
+  ];
+  for (const c of candidates) {
+    if (c !== undefined && c !== null && String(c).length > 0) return String(c);
+  }
+  return undefined;
+}
 
 function timingSafeEqual(a: string, b: string): boolean {
   const bufA = Buffer.from(a);
@@ -156,16 +169,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const newStatus = payload.data?.new_status;
-  if (String(newStatus) !== String(qualifiedStatusId)) {
-    return NextResponse.json({
-      skipped: true,
-      reason: "status not qualified",
-      newStatus,
-    });
-  }
-
-  const leadId = payload.data?.id ? String(payload.data.id) : undefined;
+  const leadId = extractLeadId(payload);
   if (!leadId) {
     return NextResponse.json({ error: "lead id missing in payload" }, { status: 400 });
   }
@@ -173,6 +177,14 @@ export async function POST(req: NextRequest) {
   const lead = await fetchPerfexLead(crmUrl, crmToken, leadId);
   if (!lead) {
     return NextResponse.json({ error: "lead not found" }, { status: 404 });
+  }
+
+  if (String(lead.status) !== String(qualifiedStatusId)) {
+    return NextResponse.json({
+      skipped: true,
+      reason: "lead status not qualified",
+      leadStatus: lead.status,
+    });
   }
 
   if (cfCapiSent) {
