@@ -104,13 +104,18 @@ async function fetchPerfexLead(
 async function markLeadCapiSent(
   crmUrl: string,
   crmToken: string,
-  leadId: string,
+  lead: PerfexLead,
   fieldId: string,
   value: string,
-): Promise<boolean> {
+): Promise<{ ok: boolean; status?: number; body?: string }> {
+  const leadId = String(lead.id ?? "");
+  if (!leadId) return { ok: false, body: "missing lead id" };
+
+  // Try 1: form-encoded with a no-op standard field (Perfex requires at least one)
   const params = new URLSearchParams();
+  if (lead.name) params.append("name", String(lead.name));
   params.append(`custom_fields[leads][${fieldId}]`, value);
-  const res = await fetch(`${crmUrl}/api/leads/${leadId}`, {
+  let res = await fetch(`${crmUrl}/api/leads/${leadId}`, {
     method: "PUT",
     headers: {
       authtoken: crmToken,
@@ -118,11 +123,35 @@ async function markLeadCapiSent(
     },
     body: params.toString(),
   });
-  if (!res.ok) {
-    console.error("Perfex update lead failed:", res.status, await res.text());
-    return false;
-  }
-  return true;
+  if (res.ok) return { ok: true, status: res.status };
+
+  const firstError = await res.text();
+
+  // Try 2: nested JSON body (matches the Perfex API docs example)
+  res = await fetch(`${crmUrl}/api/leads/${leadId}`, {
+    method: "PUT",
+    headers: {
+      authtoken: crmToken,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      name: lead.name,
+      custom_fields: { leads: { [fieldId]: value } },
+    }),
+  });
+  if (res.ok) return { ok: true, status: res.status };
+
+  const secondError = await res.text();
+  console.error("Perfex update lead failed (both formats):", {
+    form: firstError,
+    json: secondError,
+  });
+  return {
+    ok: false,
+    status: res.status,
+    body: `form=${firstError.slice(0, 200)} | json=${secondError.slice(0, 200)}`,
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -231,17 +260,18 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  let markResult: { ok: boolean; status?: number; body?: string } | null = null;
   if (cfCapiSent) {
-    await markLeadCapiSent(
+    markResult = await markLeadCapiSent(
       crmUrl,
       crmToken,
-      leadId,
+      lead,
       cfCapiSent,
       new Date().toISOString(),
     );
   }
 
-  return NextResponse.json({ ok: true, leadId });
+  return NextResponse.json({ ok: true, leadId, mark: markResult });
 }
 
 export async function GET() {
