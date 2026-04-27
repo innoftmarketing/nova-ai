@@ -47,6 +47,17 @@ export async function POST(req: NextRequest) {
 
     const warnings: string[] = [];
 
+    // Capture ad fingerprint (Facebook click cookies, IP, UA) early so we can
+    // store it on the Perfex lead and later send a QualifiedLead CAPI event.
+    const fbc = req.cookies.get("_fbc")?.value;
+    const fbp = req.cookies.get("_fbp")?.value;
+    const userAgent = req.headers.get("user-agent") ?? undefined;
+    const xff = req.headers.get("x-forwarded-for");
+    const clientIp =
+      xff?.split(",")[0].trim() ||
+      req.headers.get("x-real-ip") ||
+      undefined;
+
     // ── Perfex CRM Integration ──
     const crmUrl = process.env.PERFEX_CRM_URL;
     const crmToken = process.env.PERFEX_CRM_API_TOKEN;
@@ -85,6 +96,18 @@ export async function POST(req: NextRequest) {
         if (utm_campaign) crmParams.append("custom_fields[leads][17]", utm_campaign);
         if (utm_medium) crmParams.append("custom_fields[leads][19]", utm_medium);
         if (utm_content) crmParams.append("custom_fields[leads][18]", utm_content);
+
+        // Ad fingerprint custom fields (for QualifiedLead CAPI event later)
+        const cfFbc = process.env.PERFEX_CF_FBC;
+        const cfFbp = process.env.PERFEX_CF_FBP;
+        const cfIp = process.env.PERFEX_CF_CLIENT_IP;
+        const cfUa = process.env.PERFEX_CF_CLIENT_USER_AGENT;
+        const cfEventId = process.env.PERFEX_CF_EVENT_ID;
+        if (cfFbc && fbc) crmParams.append(`custom_fields[leads][${cfFbc}]`, fbc);
+        if (cfFbp && fbp) crmParams.append(`custom_fields[leads][${cfFbp}]`, fbp);
+        if (cfIp && clientIp) crmParams.append(`custom_fields[leads][${cfIp}]`, clientIp);
+        if (cfUa && userAgent) crmParams.append(`custom_fields[leads][${cfUa}]`, userAgent);
+        if (cfEventId && eventId) crmParams.append(`custom_fields[leads][${cfEventId}]`, eventId);
 
         const crmRes = await fetch(`${crmUrl}/api/leads`, {
           method: "POST",
@@ -202,15 +225,6 @@ export async function POST(req: NextRequest) {
 
     // ── Meta Conversions API (server-side Lead event) ──
     try {
-      const fbc = req.cookies.get("_fbc")?.value;
-      const fbp = req.cookies.get("_fbp")?.value;
-      const userAgent = req.headers.get("user-agent") ?? undefined;
-      const xff = req.headers.get("x-forwarded-for");
-      const clientIp =
-        xff?.split(",")[0].trim() ||
-        req.headers.get("x-real-ip") ||
-        undefined;
-
       const capiResult = await sendCAPIEvent({
         eventName: "Lead",
         eventId,
