@@ -33,13 +33,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const {
-      fullName, phone, email, company, companyDescription, city, hasWebsite, timeline, date, time,
+      fullName, phone, email, company, companyDescription, city, citySegment, hasWebsite, timeline, date, time,
       utm_source, utm_medium, utm_campaign, utm_content,
       language,
       eventId, sourceUrl,
     } = body;
 
     const lang = language === "ar" ? "ar" : "fr";
+    const isCasa =
+      citySegment === "casa" ||
+      (typeof city === "string" && city.trim().toLowerCase() === "casablanca");
 
     if (!fullName || !phone) {
       return NextResponse.json(
@@ -229,29 +232,33 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Meta Conversions API (server-side Lead event) ──
-    try {
-      const capiResult = await sendCAPIEvent({
-        eventName: "Lead",
-        eventId,
-        eventSourceUrl: sourceUrl,
-        email,
-        phone,
-        fullName,
-        city,
-        country: "ma",
-        clientIp,
-        clientUserAgent: userAgent,
-        fbc,
-        fbp,
-        customData: { content_category: lang, language: lang },
-      });
+    // Only fire for Casablanca leads — outside-Casa leads enter the CRM/calendar
+    // normally but are kept off the pixel so Facebook keeps optimising for Casa.
+    if (isCasa) {
+      try {
+        const capiResult = await sendCAPIEvent({
+          eventName: "Lead",
+          eventId,
+          eventSourceUrl: sourceUrl,
+          email,
+          phone,
+          fullName,
+          city,
+          country: "ma",
+          clientIp,
+          clientUserAgent: userAgent,
+          fbc,
+          fbp,
+          customData: { content_category: lang, language: lang },
+        });
 
-      if (!capiResult.ok) {
+        if (!capiResult.ok) {
+          warnings.push("Meta CAPI lead event failed");
+        }
+      } catch (err) {
+        console.error("Meta CAPI send failed:", err);
         warnings.push("Meta CAPI lead event failed");
       }
-    } catch (err) {
-      console.error("Meta CAPI send failed:", err);
-      warnings.push("Meta CAPI lead event failed");
     }
 
     if (warnings.length > 0) {

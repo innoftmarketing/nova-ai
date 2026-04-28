@@ -235,6 +235,16 @@ export async function POST(req: NextRequest) {
   const storedLanguage = getCustomFieldValue(lead, process.env.PERFEX_CF_LANGUAGE);
   const language = storedLanguage === "ar" ? "ar" : "fr";
 
+  const leadCity = typeof lead.city === "string" ? lead.city : "";
+  const isCasa = leadCity.trim().toLowerCase() === "casablanca";
+  if (!isCasa) {
+    return NextResponse.json({
+      skipped: true,
+      reason: "lead is not Casablanca — pixel suppressed for outside-Casa segment",
+      city: leadCity,
+    });
+  }
+
   const phone = (lead.phonenumber || lead.phone) as string | undefined;
 
   const capiResult = await sendCAPIEvent({

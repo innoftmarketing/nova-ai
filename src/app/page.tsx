@@ -231,6 +231,8 @@ function BookingWizard() {
   // "calendar" | "timeslots" | "form"
   const [step, setStep] = useState<"calendar" | "timeslots" | "form">("calendar");
   const [submitting, setSubmitting] = useState(false);
+  const [citySegment, setCitySegment] = useState<"casa" | "autre" | null>(null);
+  const [otherCity, setOtherCity] = useState("");
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { captureUtmsFromUrl(); }, []);
@@ -562,6 +564,11 @@ function BookingWizard() {
 
               const language = getStoredLanguage();
 
+              const isCasa = citySegment === "casa";
+              const cityValue = isCasa
+                ? "Casablanca"
+                : (otherCity.trim() || "Autre");
+
               try {
                 await fetch("/api/leads", {
                   method: "POST",
@@ -572,7 +579,8 @@ function BookingWizard() {
                     email: formData.get("email"),
                     company: formData.get("company"),
                     companyDescription: formData.get("companyDescription"),
-                    city: formData.get("city"),
+                    city: cityValue,
+                    citySegment: isCasa ? "casa" : "other",
                     hasWebsite: formData.get("has_website"),
                     timeline: formData.get("timeline"),
                     date: selectedDateLabel || "",
@@ -590,7 +598,11 @@ function BookingWizard() {
                 // Still redirect even if API fails
               }
 
-              if (typeof window !== "undefined" && typeof window.fbq === "function") {
+              if (
+                isCasa &&
+                typeof window !== "undefined" &&
+                typeof window.fbq === "function"
+              ) {
                 window.fbq(
                   "track",
                   "Lead",
@@ -603,7 +615,11 @@ function BookingWizard() {
                 date: selectedDateLabel || "",
                 time: selectedTime || "",
               });
-              const thankYouPath = language === "ar" ? "/merci-ar" : "/merci-fr";
+              const thankYouPath = !isCasa
+                ? "/merci-autre"
+                : language === "ar"
+                ? "/merci-ar"
+                : "/merci-fr";
               router.push(`${thankYouPath}?${params.toString()}`);
             }}
           >
@@ -679,18 +695,52 @@ function BookingWizard() {
             </div>
 
             {/* Ville */}
-            <div>
-              <label className="block text-sm font-medium text-on-surface-variant mb-2">
+            <fieldset>
+              <legend className="block text-sm font-medium text-on-surface-variant mb-3">
                 Ville <span className="text-primary-container">*</span>
-              </label>
-              <input
-                name="city"
-                className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
-                placeholder="Votre ville"
-                required
-                type="text"
-              />
-            </div>
+              </legend>
+              <div className="flex gap-4">
+                <label className="flex-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="city_segment"
+                    value="casa"
+                    required
+                    className="peer sr-only"
+                    checked={citySegment === "casa"}
+                    onChange={() => setCitySegment("casa")}
+                  />
+                  <div className="py-3 px-4 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium">
+                    Casablanca
+                  </div>
+                </label>
+                <label className="flex-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="city_segment"
+                    value="autre"
+                    required
+                    className="peer sr-only"
+                    checked={citySegment === "autre"}
+                    onChange={() => setCitySegment("autre")}
+                  />
+                  <div className="py-3 px-4 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium">
+                    Autre
+                  </div>
+                </label>
+              </div>
+              {citySegment === "autre" && (
+                <input
+                  name="city_other"
+                  value={otherCity}
+                  onChange={(e) => setOtherCity(e.target.value)}
+                  className="mt-3 w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
+                  placeholder="Précisez votre ville"
+                  required
+                  type="text"
+                />
+              )}
+            </fieldset>
 
             {/* Avez-vous déjà un site web ? */}
             <fieldset>
