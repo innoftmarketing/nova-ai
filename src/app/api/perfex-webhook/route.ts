@@ -232,6 +232,8 @@ export async function POST(req: NextRequest) {
   const clientIp = getCustomFieldValue(lead, process.env.PERFEX_CF_CLIENT_IP);
   const clientUserAgent = getCustomFieldValue(lead, process.env.PERFEX_CF_CLIENT_USER_AGENT);
   const eventId = getCustomFieldValue(lead, process.env.PERFEX_CF_EVENT_ID);
+  const storedLanguage = getCustomFieldValue(lead, process.env.PERFEX_CF_LANGUAGE);
+  const language = storedLanguage === "ar" ? "ar" : "fr";
 
   const phone = (lead.phonenumber || lead.phone) as string | undefined;
 
@@ -250,6 +252,8 @@ export async function POST(req: NextRequest) {
     customData: {
       currency: "MAD",
       lead_status: String(lead.status),
+      content_category: language,
+      language,
     },
   });
 

@@ -35,8 +35,11 @@ export async function POST(req: NextRequest) {
     const {
       fullName, phone, email, company, companyDescription, city, hasWebsite, timeline, date, time,
       utm_source, utm_medium, utm_campaign, utm_content,
+      language,
       eventId, sourceUrl,
     } = body;
+
+    const lang = language === "ar" ? "ar" : "fr";
 
     if (!fullName || !phone) {
       return NextResponse.json(
@@ -103,11 +106,13 @@ export async function POST(req: NextRequest) {
         const cfIp = process.env.PERFEX_CF_CLIENT_IP;
         const cfUa = process.env.PERFEX_CF_CLIENT_USER_AGENT;
         const cfEventId = process.env.PERFEX_CF_EVENT_ID;
+        const cfLanguage = process.env.PERFEX_CF_LANGUAGE;
         if (cfFbc && fbc) crmParams.append(`custom_fields[leads][${cfFbc}]`, fbc);
         if (cfFbp && fbp) crmParams.append(`custom_fields[leads][${cfFbp}]`, fbp);
         if (cfIp && clientIp) crmParams.append(`custom_fields[leads][${cfIp}]`, clientIp);
         if (cfUa && userAgent) crmParams.append(`custom_fields[leads][${cfUa}]`, userAgent);
         if (cfEventId && eventId) crmParams.append(`custom_fields[leads][${cfEventId}]`, eventId);
+        if (cfLanguage) crmParams.append(`custom_fields[leads][${cfLanguage}]`, lang);
 
         const crmRes = await fetch(`${crmUrl}/api/leads`, {
           method: "POST",
@@ -238,6 +243,7 @@ export async function POST(req: NextRequest) {
         clientUserAgent: userAgent,
         fbc,
         fbp,
+        customData: { content_category: lang, language: lang },
       });
 
       if (!capiResult.ok) {

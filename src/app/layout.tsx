@@ -40,6 +40,13 @@ export default function RootLayout({
             src="https://www.facebook.com/tr?id=766036584632817&ev=PageView&noscript=1"
             alt=""
           />
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=1459567445274928&ev=PageView&noscript=1"
+            alt=""
+          />
         </noscript>
       </head>
       <body className="font-body antialiased">
@@ -55,6 +62,7 @@ export default function RootLayout({
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '766036584632817');
+            fbq('init', '1459567445274928');
             fbq('track', 'PageView');
           `}
         </Script>

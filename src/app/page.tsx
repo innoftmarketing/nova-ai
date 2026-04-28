@@ -169,6 +169,56 @@ function getStoredUtms(): UtmMap {
   return {};
 }
 
+/* ───────── Language helpers (ad-segment tagging) ───────── */
+type AdLanguage = "fr" | "ar";
+
+function persistLanguage(lang: AdLanguage) {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem("innoft_lang", lang);
+    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = `innoft_lang=${lang};expires=${expires};path=/;SameSite=Lax`;
+  } catch {
+    // storage blocked — silent
+  }
+}
+
+function captureLanguageFromUrl() {
+  if (typeof window === "undefined") return;
+  const params = new URLSearchParams(window.location.search);
+  const raw = (params.get("lang") || params.get("seg") || "").toLowerCase();
+  if (raw !== "ar" && raw !== "fr") return;
+  persistLanguage(raw);
+}
+
+function captureLanguageFromPathname() {
+  if (typeof window === "undefined") return;
+  const path = window.location.pathname.toLowerCase();
+  if (path === "/ar" || path.startsWith("/ar/")) {
+    persistLanguage("ar");
+  }
+}
+
+function getStoredLanguage(): AdLanguage {
+  if (typeof window === "undefined") return "fr";
+  try {
+    const session = sessionStorage.getItem("innoft_lang");
+    if (session === "ar" || session === "fr") return session;
+  } catch {
+    // ignore
+  }
+  try {
+    const match = document.cookie.match(/(?:^|; )innoft_lang=([^;]+)/);
+    if (match) {
+      const v = decodeURIComponent(match[1]);
+      if (v === "ar" || v === "fr") return v;
+    }
+  } catch {
+    // ignore
+  }
+  return "fr";
+}
+
 /* ───────── Booking Wizard ───────── */
 function BookingWizard() {
   const router = useRouter();
@@ -184,6 +234,10 @@ function BookingWizard() {
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { captureUtmsFromUrl(); }, []);
+  useEffect(() => {
+    captureLanguageFromPathname();
+    captureLanguageFromUrl();
+  }, []);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
@@ -506,6 +560,8 @@ function BookingWizard() {
               const sourceUrl =
                 typeof window !== "undefined" ? window.location.href : "";
 
+              const language = getStoredLanguage();
+
               try {
                 await fetch("/api/leads", {
                   method: "POST",
@@ -525,6 +581,7 @@ function BookingWizard() {
                     utm_medium: utms.utm_medium || "",
                     utm_campaign: utms.utm_campaign || "",
                     utm_content: utms.utm_content || "",
+                    language,
                     eventId,
                     sourceUrl,
                   }),
@@ -534,14 +591,20 @@ function BookingWizard() {
               }
 
               if (typeof window !== "undefined" && typeof window.fbq === "function") {
-                window.fbq("track", "Lead", {}, { eventID: eventId });
+                window.fbq(
+                  "track",
+                  "Lead",
+                  { content_category: language, language },
+                  { eventID: eventId },
+                );
               }
 
               const params = new URLSearchParams({
                 date: selectedDateLabel || "",
                 time: selectedTime || "",
               });
-              router.push(`/merci-fr?${params.toString()}`);
+              const thankYouPath = language === "ar" ? "/merci-ar" : "/merci-fr";
+              router.push(`${thankYouPath}?${params.toString()}`);
             }}
           >
             {/* Nom complet */}
