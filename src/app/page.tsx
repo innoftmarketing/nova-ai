@@ -424,8 +424,8 @@ function BookingWizard() {
                 <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">
                   Stratégie + site intelligent + publications
                 </p>
-                <p className="font-headline text-xl font-extrabold text-[#0b24fa]">
-                  à partir de 8 000 DH
+                <p className="font-headline text-xl font-extrabold text-[#0b24fa] whitespace-nowrap">
+                  à partir de{"\u00A0"}8{"\u00A0"}000{"\u00A0"}DH
                 </p>
               </div>
             </div>
@@ -962,17 +962,17 @@ export default function Home() {
                   Réserver mon Diagnostic Stratégique
                 </a>
               </div>
-              <div className="mt-5 inline-flex items-center gap-4 rounded-2xl border-2 border-[#0b24fa]/25 bg-[#0b24fa]/5 px-6 py-4">
+              <div className="mt-5 flex w-full sm:w-auto sm:inline-flex items-center justify-between sm:justify-start gap-4 rounded-2xl border-2 border-[#0b24fa]/25 bg-[#0b24fa]/5 px-5 py-4">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+                  <p className="text-[0.65rem] sm:text-xs font-bold uppercase tracking-widest text-on-surface-variant whitespace-nowrap">
                     Accompagnements complets
                   </p>
-                  <p className="font-headline text-2xl font-extrabold text-[#0b24fa] leading-tight">
-                    à partir de 8 000 DH
+                  <p className="font-headline text-xl sm:text-2xl font-extrabold text-[#0b24fa] leading-tight whitespace-nowrap">
+                    à partir de{"\u00A0"}8{"\u00A0"}000{"\u00A0"}DH
                   </p>
                 </div>
-                <div className="h-10 w-px bg-[#0b24fa]/20" />
-                <p className="text-sm font-semibold text-on-surface">
+                <div className="h-10 w-px bg-[#0b24fa]/20 shrink-0" />
+                <p className="text-sm font-semibold text-on-surface shrink-0">
                   Diagnostic<br />offert
                 </p>
               </div>
