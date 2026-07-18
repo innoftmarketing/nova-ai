@@ -420,10 +420,14 @@ function BookingWizard() {
             </div>
             <div className="space-y-4 text-sm text-on-surface-variant leading-relaxed">
               <p>Après avoir rempli le formulaire, vous recevrez <strong className="text-on-surface">un appel téléphonique</strong> de l&apos;un de nos <strong className="text-on-surface">consultants</strong>.</p>
-              <p className="pt-4 border-t border-outline-variant/10">
-                Nos accompagnements complets — stratégie, site intelligent, publications —
-                démarrent <strong className="text-on-surface">à partir de 8 000 DH</strong>.
-              </p>
+              <div className="mt-4 rounded-xl border-2 border-[#0b24fa]/25 bg-[#0b24fa]/5 px-4 py-3">
+                <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">
+                  Stratégie + site intelligent + publications
+                </p>
+                <p className="font-headline text-xl font-extrabold text-[#0b24fa]">
+                  à partir de 8 000 DH
+                </p>
+              </div>
             </div>
           </div>
 
@@ -958,10 +962,20 @@ export default function Home() {
                   Réserver mon Diagnostic Stratégique
                 </a>
               </div>
-              <p className="mt-4 text-sm text-on-surface-variant">
-                Diagnostic offert · Accompagnements complets{" "}
-                <span className="text-on-surface font-semibold">à partir de 8 000 DH</span>
-              </p>
+              <div className="mt-6 inline-flex items-center gap-4 rounded-2xl border-2 border-[#0b24fa]/25 bg-[#0b24fa]/5 px-6 py-4">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+                    Accompagnements complets
+                  </p>
+                  <p className="font-headline text-2xl font-extrabold text-[#0b24fa] leading-tight">
+                    à partir de 8 000 DH
+                  </p>
+                </div>
+                <div className="h-10 w-px bg-[#0b24fa]/20" />
+                <p className="text-sm font-semibold text-on-surface">
+                  Diagnostic<br />offert
+                </p>
+              </div>
             </div>
 
             <div className="relative flex justify-center items-center">
