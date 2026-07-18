@@ -312,10 +312,10 @@ function BookingWizard() {
             <div key={time} className="flex gap-2 items-center">
               <button
                 onClick={() => setSelectedTime(time)}
-                className={`flex-1 py-3 rounded-xl font-medium transition-all border text-sm
+                className={`flex-1 py-3 rounded-xl font-semibold transition-all border-2 text-sm
                   ${isSelected
-                    ? "bg-surface-container-highest border-primary/40 text-primary"
-                    : "border-outline-variant/20 text-on-surface hover:border-primary/40 hover:text-primary"
+                    ? "bg-[#0b24fa] border-[#0b24fa] text-white shadow-[0_4px_12px_rgba(11,36,250,0.3)]"
+                    : "border-[#d5daea] bg-white text-[#3a4265] hover:border-[#0b24fa]/40"
                   }
                 `}
               >
@@ -491,7 +491,7 @@ function BookingWizard() {
                         ${disabled ? "opacity-20 cursor-not-allowed text-on-surface-variant pointer-events-none" : "cursor-pointer"}
                         ${isSelected ? "bg-primary text-on-primary font-bold shadow-[0_0_15px_rgba(36,64,255,0.3)]" : ""}
                         ${!disabled && !isSelected && isToday ? "text-primary font-semibold border border-primary/40 bg-primary/10 hover:bg-primary/20" : ""}
-                        ${!disabled && !isSelected && !isToday ? "text-on-surface font-medium bg-surface-container-high/60 hover:bg-primary-container/30 hover:text-primary" : ""}
+                        ${!disabled && !isSelected && !isToday ? "text-[#1a2350] font-semibold bg-[#eef1fa] hover:bg-[#0b24fa]/10 hover:text-[#0b24fa]" : ""}
                       `}
                     >
                       {day}
@@ -645,12 +645,12 @@ function BookingWizard() {
           >
             {/* Nom complet */}
             <div>
-              <label className="block text-sm font-medium text-on-surface-variant mb-2">
+              <label className="block text-sm font-bold text-on-surface mb-2">
                 Nom complet <span className="text-primary-container">*</span>
               </label>
               <input
                 name="fullName"
-                className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
+                className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none"
                 placeholder="Votre nom complet"
                 required
                 type="text"
@@ -659,12 +659,12 @@ function BookingWizard() {
 
             {/* Numéro de téléphone */}
             <div>
-              <label className="block text-sm font-medium text-on-surface-variant mb-2">
+              <label className="block text-sm font-bold text-on-surface mb-2">
                 Numéro de téléphone <span className="text-primary-container">*</span>
               </label>
               <input
                 name="phone"
-                className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
+                className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none"
                 placeholder="0661 00 00 00"
                 required
                 type="tel"
@@ -673,12 +673,12 @@ function BookingWizard() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-on-surface-variant mb-2">
+              <label className="block text-sm font-bold text-on-surface mb-2">
                 Adresse email <span className="text-primary-container">*</span>
               </label>
               <input
                 name="email"
-                className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
+                className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none"
                 placeholder="votre@email.com"
                 required
                 type="email"
@@ -687,12 +687,12 @@ function BookingWizard() {
 
             {/* Nom de l'entreprise */}
             <div>
-              <label className="block text-sm font-medium text-on-surface-variant mb-2">
+              <label className="block text-sm font-bold text-on-surface mb-2">
                 Nom de l&apos;entreprise <span className="text-primary-container">*</span>
               </label>
               <input
                 name="company"
-                className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
+                className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none"
                 placeholder="Nom de votre entreprise"
                 required
                 type="text"
@@ -701,12 +701,12 @@ function BookingWizard() {
 
             {/* Description de l'entreprise */}
             <div>
-              <label className="block text-sm font-medium text-on-surface-variant mb-2">
+              <label className="block text-sm font-bold text-on-surface mb-2">
                 Décrivez brièvement votre activité <span className="text-primary-container">*</span>
               </label>
               <textarea
                 name="companyDescription"
-                className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none resize-none"
+                className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none resize-none"
                 placeholder="Ex : Nous sommes un salon de coiffure à Casablanca, nous cherchons à attirer plus de clients en ligne..."
                 required
                 rows={3}
@@ -716,7 +716,7 @@ function BookingWizard() {
 
             {/* Ville */}
             <fieldset>
-              <legend className="block text-sm font-medium text-on-surface-variant mb-3">
+              <legend className="block text-sm font-bold text-on-surface mb-3">
                 Ville <span className="text-primary-container">*</span>
               </legend>
               <div className="flex gap-4">
@@ -730,7 +730,7 @@ function BookingWizard() {
                     checked={citySegment === "casa"}
                     onChange={() => setCitySegment("casa")}
                   />
-                  <div className="py-3 px-4 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium">
+                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">
                     Casablanca
                   </div>
                 </label>
@@ -744,7 +744,7 @@ function BookingWizard() {
                     checked={citySegment === "autre"}
                     onChange={() => setCitySegment("autre")}
                   />
-                  <div className="py-3 px-4 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium">
+                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">
                     Autre
                   </div>
                 </label>
@@ -754,7 +754,7 @@ function BookingWizard() {
                   name="city_other"
                   value={otherCity}
                   onChange={(e) => setOtherCity(e.target.value)}
-                  className="mt-3 w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-on-surface-variant/40 outline-none"
+                  className="mt-3 w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none"
                   placeholder="Précisez votre ville"
                   required
                   type="text"
@@ -764,19 +764,19 @@ function BookingWizard() {
 
             {/* Avez-vous déjà un site web ? */}
             <fieldset>
-              <legend className="block text-sm font-medium text-on-surface-variant mb-3">
+              <legend className="block text-sm font-bold text-on-surface mb-3">
                 Avez-vous déjà un site web ? <span className="text-primary-container">*</span>
               </legend>
               <div className="flex gap-4">
                 <label className="flex-1 cursor-pointer">
                   <input type="radio" name="has_website" value="oui" required className="peer sr-only" />
-                  <div className="py-3 px-4 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium">
+                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">
                     Oui
                   </div>
                 </label>
                 <label className="flex-1 cursor-pointer">
                   <input type="radio" name="has_website" value="non" required className="peer sr-only" />
-                  <div className="py-3 px-4 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium">
+                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">
                     Non
                   </div>
                 </label>
@@ -785,7 +785,7 @@ function BookingWizard() {
 
             {/* Ancienneté de l'entreprise */}
             <fieldset>
-              <legend className="block text-sm font-medium text-on-surface-variant mb-3">
+              <legend className="block text-sm font-bold text-on-surface mb-3">
                 Votre entreprise est active depuis <span className="text-primary-container">*</span>
               </legend>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -797,7 +797,7 @@ function BookingWizard() {
                 ].map(([v, l]) => (
                   <label key={v} className="cursor-pointer">
                     <input type="radio" name="company_age" value={v} required className="peer sr-only" />
-                    <div className="py-3 px-2 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium text-sm">
+                    <div className="py-3 px-2 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">
                       {l}
                     </div>
                   </label>
@@ -807,7 +807,7 @@ function BookingWizard() {
 
             {/* Chiffre d'affaires annuel moyen */}
             <fieldset>
-              <legend className="block text-sm font-medium text-on-surface-variant mb-3">
+              <legend className="block text-sm font-bold text-on-surface mb-3">
                 Chiffre d&apos;affaires annuel moyen <span className="text-primary-container">*</span>
               </legend>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -819,7 +819,7 @@ function BookingWizard() {
                 ].map(([v, l]) => (
                   <label key={v} className="cursor-pointer">
                     <input type="radio" name="company_ca" value={v} required className="peer sr-only" />
-                    <div className="py-3 px-2 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium text-sm">
+                    <div className="py-3 px-2 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">
                       {l}
                     </div>
                   </label>
@@ -832,25 +832,25 @@ function BookingWizard() {
 
             {/* Quand souhaitez-vous lancer votre projet ? */}
             <fieldset>
-              <legend className="block text-sm font-medium text-on-surface-variant mb-3">
+              <legend className="block text-sm font-bold text-on-surface mb-3">
                 Quand souhaitez-vous lancer votre projet ? <span className="text-primary-container">*</span>
               </legend>
               <div className="flex flex-col sm:flex-row gap-3">
                 <label className="flex-1 cursor-pointer">
                   <input type="radio" name="timeline" value="asap" required className="peer sr-only" />
-                  <div className="py-3 px-4 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium text-sm">
+                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">
                     Dès que possible
                   </div>
                 </label>
                 <label className="flex-1 cursor-pointer">
                   <input type="radio" name="timeline" value="few_months" required className="peer sr-only" />
-                  <div className="py-3 px-4 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium text-sm">
+                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">
                     Dans quelques mois
                   </div>
                 </label>
                 <label className="flex-1 cursor-pointer">
                   <input type="radio" name="timeline" value="exploring" required className="peer sr-only" />
-                  <div className="py-3 px-4 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium text-sm">
+                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">
                     Je me renseigne
                   </div>
                 </label>
@@ -863,7 +863,7 @@ function BookingWizard() {
                 type="checkbox"
                 name="confirm_rdv"
                 required
-                className="mt-1 h-5 w-5 rounded border-outline-variant/20 bg-surface-container text-primary focus:ring-primary accent-primary cursor-pointer shrink-0"
+                className="mt-1 h-5 w-5 rounded border-2 border-[#b9c2dd] bg-white text-primary focus:ring-primary accent-primary cursor-pointer shrink-0"
               />
               <span className="text-sm text-on-surface-variant leading-relaxed">
                 Je confirme que je recevrai un appel d&apos;un consultant et je serai au rendez-vous <span className="text-on-surface font-medium">(INCHAALLAH)</span>
