@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`dark ${nunito.variable}`}>
+    <html lang="fr" className={nunito.variable}>
       <head>
         <link rel="icon" href="https://innoft.ma/wp-content/uploads/2024/06/produit-1024x1024.png" />
         <noscript>

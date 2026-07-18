@@ -367,7 +367,7 @@ function BookingWizard() {
           <div className="flex items-center gap-4 mb-2">
             <button
               onClick={() => { setStep("calendar"); setSelectedTime(null); setTimeout(scrollToContact, 50); }}
-              className="p-1 hover:bg-white/5 rounded-full transition-colors"
+              className="p-1 hover:bg-[#0d1136]/5 rounded-full transition-colors"
             >
               <ChevronLeftIcon className="w-5 h-5 text-on-surface" />
             </button>
@@ -436,10 +436,10 @@ function BookingWizard() {
                   {MONTH_NAMES[currentMonth]} {currentYear}
                 </h4>
                 <div className="flex gap-2">
-                  <button onClick={prevMonth} className={`p-1 rounded-full transition-colors ${isCurrentMonth ? "opacity-30 cursor-not-allowed" : "hover:bg-white/5"}`}>
+                  <button onClick={prevMonth} className={`p-1 rounded-full transition-colors ${isCurrentMonth ? "opacity-30 cursor-not-allowed" : "hover:bg-[#0d1136]/5"}`}>
                     <ChevronLeftIcon className="w-5 h-5 text-on-surface" />
                   </button>
-                  <button onClick={nextMonth} className="p-1 hover:bg-white/5 rounded-full transition-colors">
+                  <button onClick={nextMonth} className="p-1 hover:bg-[#0d1136]/5 rounded-full transition-colors">
                     <ChevronRightIcon className="w-5 h-5 text-on-surface" />
                   </button>
                 </div>
@@ -892,25 +892,25 @@ export default function Home() {
   return (
     <>
       {/* ── Navigation ── */}
-      <nav className="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,0,0,0.25)]">
+      <nav className="fixed top-0 w-full z-50 bg-white/85 backdrop-blur-xl border-b border-[#e5e9f5] shadow-[0_6px_24px_rgba(13,17,54,0.06)]">
         <div className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto font-headline tracking-tight">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="https://innoft.ma/wp-content/uploads/2024/06/log-2048x2048.png" alt="Innoft" className="h-14 w-auto" />
+          <img src="https://innoft.ma/wp-content/uploads/2024/06/log-2048x2048.png" alt="Innoft" className="h-12 w-auto [filter:brightness(0)_saturate(100%)_invert(12%)_sepia(90%)_saturate(6000%)_hue-rotate(240deg)]" />
           <div className="hidden md:flex items-center gap-8">
             <a
-              className="text-slate-300 hover:text-white transition-colors"
+              className="text-[#4a5273] hover:text-[#0b24fa] transition-colors font-semibold"
               href="#solution"
             >
               La Solution
             </a>
             <a
-              className="text-slate-300 hover:text-white transition-colors"
+              className="text-[#4a5273] hover:text-[#0b24fa] transition-colors font-semibold"
               href="#concept"
             >
               Le Concept
             </a>
             <a
-              className="text-slate-300 hover:text-white transition-colors"
+              className="text-[#4a5273] hover:text-[#0b24fa] transition-colors font-semibold"
               href="#resultat"
             >
               Témoignages
@@ -964,17 +964,15 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="relative group flex justify-center items-center">
-              <div className="absolute inset-0 bg-primary/10 blur-[120px] rounded-full animate-pulse" />
-              <div className="relative w-full max-w-md aspect-square rounded-full flex items-center justify-center p-8">
+            <div className="relative flex justify-center items-center">
+              <div className="absolute inset-8 bg-[#0b24fa]/8 blur-[100px] rounded-full" />
+              <div className="relative w-full max-w-xl flex items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  alt="Expressive 3D AI Core"
-                  className="w-full h-full object-contain filter drop-shadow-[0_0_50px_rgba(36,64,255,0.45)] hue-rotate-[215deg] saturate-125 animate-float"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCC02Y4-Y3LMnIM6EqgpzAiAHbTgS3RCGhRYIglWA-pqD876sOlO-Kwc6rWKQ2QHUgegnaJ26R3Hatp12JuDiMBD7IQ25XEg3wWpycEdCssLO97F6ozlkpX1ztw-E0WDXsr9pCvutC7iPwi31hRKdAwKs26PzGDm3FIlnbkNWKYt3qe7VoXYS-Vk0rezToZ0cJUBhYX56PtOK60Ik3C1iuqHmJCD5RE9Jj-xWfahz3U9vop30-ZmFbBms61H6wMEGlUX0mVwd16CE"
+                  alt="Site intelligent Innoft — dashboard, assistant IA et WhatsApp"
+                  className="w-full h-auto object-contain drop-shadow-[0_24px_50px_rgba(13,17,54,0.18)] animate-float"
+                  src="/generated/hero-visual.png"
                 />
-                <div className="absolute inset-0 border-[0.5px] border-primary/20 rounded-full animate-spin-slow" />
-                <div className="absolute inset-4 border-[0.5px] border-primary/10 rounded-full animate-spin-slow-reverse" />
               </div>
             </div>
           </div>
@@ -1080,6 +1078,10 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="p-10 rounded-3xl bg-surface-container-high border border-outline-variant/5">
+                <div className="h-28 w-28 rounded-2xl bg-white shadow-[0_8px_24px_rgba(13,17,54,0.08)] flex items-center justify-center mb-6 p-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/generated/illu-strategie.png" alt="Stratégie" className="h-full w-full object-contain" />
+                </div>
                 <span className="text-primary font-headline font-extrabold text-4xl block mb-4">01</span>
                 <h3 className="text-2xl font-bold mb-4 text-on-surface">La stratégie</h3>
                 <p className="text-on-surface-variant leading-relaxed">
@@ -1088,6 +1090,10 @@ export default function Home() {
                 </p>
               </div>
               <div className="p-10 rounded-3xl bg-surface-container-high border border-outline-variant/5">
+                <div className="h-28 w-28 rounded-2xl bg-white shadow-[0_8px_24px_rgba(13,17,54,0.08)] flex items-center justify-center mb-6 p-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/generated/illu-site.png" alt="Site intelligent" className="h-full w-full object-contain" />
+                </div>
                 <span className="text-primary font-headline font-extrabold text-4xl block mb-4">02</span>
                 <h3 className="text-2xl font-bold mb-4 text-on-surface">Le site intelligent</h3>
                 <p className="text-on-surface-variant leading-relaxed">
@@ -1096,6 +1102,10 @@ export default function Home() {
                 </p>
               </div>
               <div className="p-10 rounded-3xl bg-surface-container-high border border-outline-variant/5">
+                <div className="h-28 w-28 rounded-2xl bg-white shadow-[0_8px_24px_rgba(13,17,54,0.08)] flex items-center justify-center mb-6 p-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/generated/illu-acquisition.png" alt="Acquisition" className="h-full w-full object-contain" />
+                </div>
                 <span className="text-primary font-headline font-extrabold text-4xl block mb-4">03</span>
                 <h3 className="text-2xl font-bold mb-4 text-on-surface">L&apos;acquisition</h3>
                 <p className="text-on-surface-variant leading-relaxed">
@@ -1179,7 +1189,7 @@ export default function Home() {
       </main>
 
       {/* ── Footer ── */}
-      <footer className="bg-slate-950 border-t border-slate-800/30">
+      <footer className="bg-[#0d1136]">
         <div className="flex flex-col md:flex-row justify-between items-center px-8 py-12 max-w-7xl mx-auto gap-6 font-body text-sm text-slate-400">
           <div className="flex flex-col items-center md:items-start gap-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1191,19 +1201,19 @@ export default function Home() {
 
           <div className="flex gap-8">
             <a
-              className="text-slate-500 hover:text-cyan-400 transition-colors"
+              className="text-slate-400 hover:text-[#c3ccff] transition-colors"
               href="#"
             >
               Confidentialité
             </a>
             <a
-              className="text-slate-500 hover:text-cyan-400 transition-colors"
+              className="text-slate-400 hover:text-[#c3ccff] transition-colors"
               href="#"
             >
               Conditions
             </a>
             <a
-              className="text-slate-500 hover:text-cyan-400 transition-colors"
+              className="text-slate-400 hover:text-[#c3ccff] transition-colors"
               href="#"
             >
               Contact
@@ -1213,7 +1223,7 @@ export default function Home() {
           <div className="flex gap-4">
             {/* Facebook */}
             <a
-              className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-slate-800 transition-colors"
+              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
               href="#"
             >
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -1222,7 +1232,7 @@ export default function Home() {
             </a>
             {/* Twitter/X */}
             <a
-              className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-slate-800 transition-colors"
+              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
               href="#"
             >
               <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
