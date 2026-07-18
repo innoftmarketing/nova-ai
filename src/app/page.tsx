@@ -933,8 +933,8 @@ export default function Home() {
 
       <main className="pt-24">
         {/* ── Section 1: Hero ── */}
-        <section className="relative overflow-hidden px-8 py-20 lg:py-32 max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <section className="relative overflow-hidden px-8 pt-12 pb-16 lg:pt-16 lg:pb-24 max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-14 items-center">
             <div className="z-10">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container/30 border border-outline-variant/20 mb-6">
                 <span className="w-2 h-2 rounded-full bg-primary-container" />
@@ -942,19 +942,19 @@ export default function Home() {
                   Stratégie digitale complète — pas un simple site web
                 </span>
               </div>
-              <h1 className="font-headline text-5xl lg:text-7xl font-extrabold leading-tight mb-6 tracking-tighter text-on-surface">
+              <h1 className="font-headline text-[2.6rem] leading-[1.08] lg:text-6xl font-extrabold lg:leading-[1.06] mb-6 tracking-tight text-on-surface [text-wrap:balance]">
                 Un site web qui{" "}
                 <span className="bg-gradient-to-r from-primary-container to-primary bg-clip-text text-transparent">
                   trouve vos clients
                 </span>
                 , leur répond, et se met à jour — tout seul.
               </h1>
-              <p className="text-lg text-on-surface-variant leading-relaxed max-w-xl mb-2">
+              <p className="text-lg text-on-surface-variant leading-relaxed max-w-lg">
                 Le site n&apos;est que l&apos;outil. Ce que nous installons, c&apos;est la{" "}
                 <span className="text-on-surface font-semibold">stratégie digitale complète qui augmente votre chiffre d&apos;affaires</span>{" "}
                 : positionnement, site intelligent, contenu et publicité.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 mt-10">
+              <div className="flex flex-col sm:flex-row gap-4 mt-8">
                 <a
                   href="#contact"
                   className="px-8 py-4 bg-gradient-to-br from-[#0b24fa] to-[#2e4bff] text-white rounded-full font-bold text-lg hover:shadow-[0_0_30px_rgba(36,64,255,0.3)] transition-all text-center"
@@ -962,7 +962,7 @@ export default function Home() {
                   Réserver mon Diagnostic Stratégique
                 </a>
               </div>
-              <div className="mt-6 inline-flex items-center gap-4 rounded-2xl border-2 border-[#0b24fa]/25 bg-[#0b24fa]/5 px-6 py-4">
+              <div className="mt-5 inline-flex items-center gap-4 rounded-2xl border-2 border-[#0b24fa]/25 bg-[#0b24fa]/5 px-6 py-4">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
                     Accompagnements complets
@@ -978,8 +978,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative flex justify-center items-center">
-              <div className="absolute inset-8 bg-[#0b24fa]/8 blur-[100px] rounded-full" />
+            <div className="relative flex justify-center items-center lg:justify-end">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] bg-[radial-gradient(closest-side,rgba(11,36,250,0.10),transparent)]" />
               <div className="relative w-full max-w-xl flex items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
