@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Manrope, Inter } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
-  weight: ["400", "700", "800"],
-  display: "swap",
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "600", "700", "800"],
   display: "swap",
 });
 
@@ -29,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`dark ${manrope.variable} ${inter.variable}`}>
+    <html lang="fr" className={`dark ${nunito.variable}`}>
       <head>
         <link rel="icon" href="https://innoft.ma/wp-content/uploads/2024/06/produit-1024x1024.png" />
         <noscript>

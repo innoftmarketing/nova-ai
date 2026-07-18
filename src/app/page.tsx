@@ -324,7 +324,7 @@ function BookingWizard() {
               {isSelected && (
                 <button
                   onClick={() => { setStep("form"); setTimeout(scrollToContact, 50); }}
-                  className="px-5 py-3 bg-gradient-to-r from-primary-container to-primary text-on-primary rounded-xl font-bold text-sm hover:shadow-[0_0_20px_rgba(0,229,255,0.3)] active:scale-95 transition-all"
+                  className="px-5 py-3 bg-gradient-to-r from-[#0b24fa] to-[#2e4bff] text-white rounded-xl font-bold text-sm hover:shadow-[0_0_20px_rgba(36,64,255,0.3)] active:scale-95 transition-all"
                 >
                   Suivant
                 </button>
@@ -342,10 +342,10 @@ function BookingWizard() {
       <div className="max-w-5xl mx-auto relative z-10">
         <div className="text-center mb-16">
           <h2 className="font-headline text-4xl lg:text-5xl font-bold mb-4 text-on-surface">
-            Passez au site intelligent.
+            Réservez votre Diagnostic Stratégique.
           </h2>
           <p className="text-on-surface-variant text-lg">
-            Choisissez un créneau. Un consultant vous contacte pour en discuter.
+            Choisissez un créneau. Un consultant vous appelle pour analyser votre situation.
           </p>
         </div>
         <div className="bg-surface-container-low rounded-[2.5rem] border border-outline-variant/10 shadow-2xl overflow-hidden min-h-[650px] flex items-center justify-center">
@@ -396,10 +396,10 @@ function BookingWizard() {
       <div className="max-w-5xl mx-auto relative z-10">
         <div className="text-center mb-16">
           <h2 className="font-headline text-4xl lg:text-5xl font-bold mb-4 text-on-surface">
-            Passez au site intelligent.
+            Réservez votre Diagnostic Stratégique.
           </h2>
           <p className="text-on-surface-variant text-lg">
-            Choisissez un créneau. Un consultant vous contacte pour en discuter.
+            Choisissez un créneau. Un consultant vous appelle pour analyser votre situation.
           </p>
         </div>
 
@@ -407,8 +407,8 @@ function BookingWizard() {
           {/* Sidebar */}
           <div className="lg:w-1/3 p-8 lg:p-12 border-b lg:border-b-0 lg:border-r border-outline-variant/10 bg-surface-container">
             <div className="mb-8">
-              <div className="text-primary-container font-bold text-sm tracking-widest uppercase mb-2">Consultation</div>
-              <h3 className="text-2xl font-bold mb-4 text-on-surface">Consultation pour Création de Site Intelligent</h3>
+              <div className="text-primary-container font-bold text-sm tracking-widest uppercase mb-2">Diagnostic Stratégique</div>
+              <h3 className="text-2xl font-bold mb-4 text-on-surface">Votre présence digitale, analysée par un consultant</h3>
               <div className="flex items-center gap-2 text-on-surface-variant mb-4">
                 <ScheduleIcon className="w-4 h-4" />
                 <span className="text-sm">20 min</span>
@@ -420,6 +420,10 @@ function BookingWizard() {
             </div>
             <div className="space-y-4 text-sm text-on-surface-variant leading-relaxed">
               <p>Après avoir rempli le formulaire, vous recevrez <strong className="text-on-surface">un appel téléphonique</strong> de l&apos;un de nos <strong className="text-on-surface">consultants</strong>.</p>
+              <p className="pt-4 border-t border-outline-variant/10">
+                Nos accompagnements complets — stratégie, site intelligent, publications —
+                démarrent <strong className="text-on-surface">à partir de 8 000 DH</strong>.
+              </p>
             </div>
           </div>
 
@@ -481,7 +485,7 @@ function BookingWizard() {
                       onClick={() => handleDayClick(day)}
                       className={`h-10 w-10 mx-auto flex items-center justify-center rounded-full transition-all text-sm
                         ${disabled ? "opacity-20 cursor-not-allowed text-on-surface-variant pointer-events-none" : "cursor-pointer"}
-                        ${isSelected ? "bg-primary text-on-primary font-bold shadow-[0_0_15px_rgba(0,229,255,0.3)]" : ""}
+                        ${isSelected ? "bg-primary text-on-primary font-bold shadow-[0_0_15px_rgba(36,64,255,0.3)]" : ""}
                         ${!disabled && !isSelected && isToday ? "text-primary font-semibold border border-primary/40 bg-primary/10 hover:bg-primary/20" : ""}
                         ${!disabled && !isSelected && !isToday ? "text-on-surface font-medium bg-surface-container-high/60 hover:bg-primary-container/30 hover:text-primary" : ""}
                       `}
@@ -537,7 +541,7 @@ function BookingWizard() {
 
           <div className="mb-10">
             <h2 className="font-headline text-3xl lg:text-4xl font-bold mb-3 text-on-surface">
-              Demander votre consultation gratuite
+              Demander mon Diagnostic Stratégique
             </h2>
             <p className="text-on-surface-variant">
               Remplissez le formulaire. Un consultant vous contacte pour confirmer.
@@ -569,6 +573,16 @@ function BookingWizard() {
                 ? "Casablanca"
                 : (otherCity.trim() || "Autre");
 
+              // ── Qualification gates ──
+              // The Meta pixel must only ever see qualified leads: once it learns
+              // from unqualified ones, delivery drifts toward more of the same.
+              const companyAge = String(formData.get("company_age") || "");
+              const companyCA = String(formData.get("company_ca") || "");
+              const qualified =
+                isCasa &&
+                companyAge !== "moins_1an" &&
+                companyCA !== "lt500k";
+
               try {
                 await fetch("/api/leads", {
                   method: "POST",
@@ -583,6 +597,8 @@ function BookingWizard() {
                     citySegment: isCasa ? "casa" : "other",
                     hasWebsite: formData.get("has_website"),
                     timeline: formData.get("timeline"),
+                    companyAge,
+                    companyCA,
                     date: selectedDateLabel || "",
                     time: selectedTime || "",
                     utm_source: utms.utm_source || "",
@@ -599,7 +615,7 @@ function BookingWizard() {
               }
 
               if (
-                isCasa &&
+                qualified &&
                 typeof window !== "undefined" &&
                 typeof window.fbq === "function"
               ) {
@@ -615,7 +631,7 @@ function BookingWizard() {
                 date: selectedDateLabel || "",
                 time: selectedTime || "",
               });
-              const thankYouPath = !isCasa
+              const thankYouPath = !qualified
                 ? "/merci-autre"
                 : language === "ar"
                 ? "/merci-ar"
@@ -763,6 +779,53 @@ function BookingWizard() {
               </div>
             </fieldset>
 
+            {/* Ancienneté de l'entreprise */}
+            <fieldset>
+              <legend className="block text-sm font-medium text-on-surface-variant mb-3">
+                Votre entreprise est active depuis <span className="text-primary-container">*</span>
+              </legend>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  ["moins_1an", "Moins d'1 an"],
+                  ["1_3ans", "1 à 3 ans"],
+                  ["3_10ans", "3 à 10 ans"],
+                  ["plus_10ans", "Plus de 10 ans"],
+                ].map(([v, l]) => (
+                  <label key={v} className="cursor-pointer">
+                    <input type="radio" name="company_age" value={v} required className="peer sr-only" />
+                    <div className="py-3 px-2 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium text-sm">
+                      {l}
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            {/* Chiffre d'affaires annuel moyen */}
+            <fieldset>
+              <legend className="block text-sm font-medium text-on-surface-variant mb-3">
+                Chiffre d&apos;affaires annuel moyen <span className="text-primary-container">*</span>
+              </legend>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  ["lt500k", "Moins de 500 000 DH"],
+                  ["500k_2m", "500 000 DH – 2M DH"],
+                  ["2m_10m", "2M – 10M DH"],
+                  ["gt10m", "Plus de 10M DH"],
+                ].map(([v, l]) => (
+                  <label key={v} className="cursor-pointer">
+                    <input type="radio" name="company_ca" value={v} required className="peer sr-only" />
+                    <div className="py-3 px-2 text-center border border-outline-variant/20 rounded-xl text-on-surface-variant peer-checked:border-primary/40 peer-checked:text-primary peer-checked:bg-primary/10 hover:border-primary/30 hover:text-primary transition-all font-medium text-sm">
+                      {l}
+                    </div>
+                  </label>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-on-surface-variant/60">
+                Ordre de grandeur uniquement — pour préparer un diagnostic pertinent pour votre taille d&apos;entreprise.
+              </p>
+            </fieldset>
+
             {/* Quand souhaitez-vous lancer votre projet ? */}
             <fieldset>
               <legend className="block text-sm font-medium text-on-surface-variant mb-3">
@@ -807,7 +870,7 @@ function BookingWizard() {
             <button
               type="submit"
               disabled={submitting}
-              className={`w-full py-5 mt-4 bg-gradient-to-r from-primary-container to-primary text-on-primary font-bold rounded-2xl text-xl transition-all ${submitting ? "opacity-60 cursor-not-allowed" : "hover:shadow-[0_10px_40px_rgba(0,229,255,0.4)] hover:scale-[1.01] active:scale-95"}`}
+              className={`w-full py-5 mt-4 bg-gradient-to-r from-[#0b24fa] to-[#2e4bff] text-white font-bold rounded-2xl text-xl transition-all ${submitting ? "opacity-60 cursor-not-allowed" : "hover:shadow-[0_10px_40px_rgba(36,64,255,0.4)] hover:scale-[1.01] active:scale-95"}`}
             >
               {submitting ? "Envoi en cours..." : "Envoyer ma demande"}
             </button>
@@ -856,7 +919,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <a
               href="#contact"
-              className="px-6 py-2 bg-gradient-to-br from-primary-container to-primary text-on-primary rounded-full font-bold text-sm hover:scale-105 active:scale-95 transition-all"
+              className="px-6 py-2 bg-gradient-to-br from-[#0b24fa] to-[#2e4bff] text-white rounded-full font-bold text-sm hover:scale-105 active:scale-95 transition-all"
             >
               Réserver
             </a>
@@ -872,7 +935,7 @@ export default function Home() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container/30 border border-outline-variant/20 mb-6">
                 <span className="w-2 h-2 rounded-full bg-primary-container" />
                 <span className="text-xs font-label uppercase tracking-widest text-primary">
-                  Intelligence Autonome v3.0
+                  Stratégie digitale complète — pas un simple site web
                 </span>
               </div>
               <h1 className="font-headline text-5xl lg:text-7xl font-extrabold leading-tight mb-6 tracking-tighter text-on-surface">
@@ -882,14 +945,23 @@ export default function Home() {
                 </span>
                 , leur répond, et se met à jour — tout seul.
               </h1>
+              <p className="text-lg text-on-surface-variant leading-relaxed max-w-xl mb-2">
+                Le site n&apos;est que l&apos;outil. Ce que nous installons, c&apos;est la{" "}
+                <span className="text-on-surface font-semibold">stratégie digitale complète qui augmente votre chiffre d&apos;affaires</span>{" "}
+                : positionnement, site intelligent, contenu et publicité.
+              </p>
               <div className="flex flex-col sm:flex-row gap-4 mt-10">
                 <a
                   href="#contact"
-                  className="px-8 py-4 bg-gradient-to-br from-primary-container to-primary text-on-primary rounded-full font-bold text-lg hover:shadow-[0_0_30px_rgba(0,229,255,0.3)] transition-all text-center"
+                  className="px-8 py-4 bg-gradient-to-br from-[#0b24fa] to-[#2e4bff] text-white rounded-full font-bold text-lg hover:shadow-[0_0_30px_rgba(36,64,255,0.3)] transition-all text-center"
                 >
-                  Réserver une consultation gratuite
+                  Réserver mon Diagnostic Stratégique
                 </a>
               </div>
+              <p className="mt-4 text-sm text-on-surface-variant">
+                Diagnostic offert · Accompagnements complets{" "}
+                <span className="text-on-surface font-semibold">à partir de 8 000 DH</span>
+              </p>
             </div>
 
             <div className="relative group flex justify-center items-center">
@@ -898,7 +970,7 @@ export default function Home() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   alt="Expressive 3D AI Core"
-                  className="w-full h-full object-contain filter drop-shadow-[0_0_50px_rgba(0,229,255,0.4)] animate-float"
+                  className="w-full h-full object-contain filter drop-shadow-[0_0_50px_rgba(36,64,255,0.45)] hue-rotate-[215deg] saturate-125 animate-float"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCC02Y4-Y3LMnIM6EqgpzAiAHbTgS3RCGhRYIglWA-pqD876sOlO-Kwc6rWKQ2QHUgegnaJ26R3Hatp12JuDiMBD7IQ25XEg3wWpycEdCssLO97F6ozlkpX1ztw-E0WDXsr9pCvutC7iPwi31hRKdAwKs26PzGDm3FIlnbkNWKYt3qe7VoXYS-Vk0rezToZ0cJUBhYX56PtOK60Ik3C1iuqHmJCD5RE9Jj-xWfahz3U9vop30-ZmFbBms61H6wMEGlUX0mVwd16CE"
                 />
                 <div className="absolute inset-0 border-[0.5px] border-primary/20 rounded-full animate-spin-slow" />
@@ -941,7 +1013,7 @@ export default function Home() {
                 Ce que fait un site intelligent.
               </h2>
               <p className="text-on-surface-variant max-w-2xl mx-auto">
-                Une infrastructure autonome conçue pour la performance absolue.
+                L&apos;outil au cœur du dispositif — mais ce n&apos;est que l&apos;étape 2 de la stratégie.
               </p>
             </div>
 
@@ -988,6 +1060,65 @@ export default function Home() {
                 </p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* ── Section 3b: La stratégie complète ── */}
+        <section id="strategie" className="px-8 py-24 bg-surface-container-lowest border-y border-outline-variant/5">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <span className="text-primary font-bold uppercase tracking-[0.2em] text-sm mb-4 block">
+                Plus qu&apos;un site web
+              </span>
+              <h2 className="font-headline text-3xl lg:text-5xl font-bold mb-4 text-on-surface">
+                La stratégie complète pour augmenter votre chiffre d&apos;affaires.
+              </h2>
+              <p className="text-on-surface-variant max-w-2xl mx-auto">
+                Un site seul ne vend pas. Nous construisons le dispositif entier — dans cet ordre.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="p-10 rounded-3xl bg-surface-container-high border border-outline-variant/5">
+                <span className="text-primary font-headline font-extrabold text-4xl block mb-4">01</span>
+                <h3 className="text-2xl font-bold mb-4 text-on-surface">La stratégie</h3>
+                <p className="text-on-surface-variant leading-relaxed">
+                  Votre offre, votre positionnement, votre cible. On définit qui doit vous
+                  trouver et pourquoi il doit vous choisir — avant de construire quoi que ce soit.
+                </p>
+              </div>
+              <div className="p-10 rounded-3xl bg-surface-container-high border border-outline-variant/5">
+                <span className="text-primary font-headline font-extrabold text-4xl block mb-4">02</span>
+                <h3 className="text-2xl font-bold mb-4 text-on-surface">Le site intelligent</h3>
+                <p className="text-on-surface-variant leading-relaxed">
+                  L&apos;infrastructure qui travaille 24h/24 : référencement automatique,
+                  assistant qui convertit les visiteurs, pilotage depuis WhatsApp.
+                </p>
+              </div>
+              <div className="p-10 rounded-3xl bg-surface-container-high border border-outline-variant/5">
+                <span className="text-primary font-headline font-extrabold text-4xl block mb-4">03</span>
+                <h3 className="text-2xl font-bold mb-4 text-on-surface">L&apos;acquisition</h3>
+                <p className="text-on-surface-variant leading-relaxed">
+                  Publicité ciblée, contenu, suivi de chaque demande — et un chiffre
+                  chaque mois : combien de contacts, combien de clients, à quel coût.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Mid-page CTA */}
+        <section className="px-8 pb-4 -mt-8 bg-surface-container-lowest">
+          <div className="max-w-7xl mx-auto text-center pb-16">
+            <a
+              href="#contact"
+              className="inline-block px-8 py-4 bg-gradient-to-br from-[#0b24fa] to-[#2e4bff] text-white rounded-full font-bold text-lg hover:shadow-[0_0_30px_rgba(36,64,255,0.4)] transition-all"
+            >
+              Réserver mon Diagnostic Stratégique
+            </a>
+            <p className="mt-3 text-sm text-on-surface-variant">
+              Offert · 6 créneaux par mois · Casablanca
+            </p>
           </div>
         </section>
 

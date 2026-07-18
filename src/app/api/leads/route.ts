@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
 
     const {
       fullName, phone, email, company, companyDescription, city, citySegment, hasWebsite, timeline, date, time,
+      companyAge, companyCA,
       utm_source, utm_medium, utm_campaign, utm_content,
       language,
       eventId, sourceUrl,
@@ -43,6 +44,27 @@ export async function POST(req: NextRequest) {
     const isCasa =
       citySegment === "casa" ||
       (typeof city === "string" && city.trim().toLowerCase() === "casablanca");
+
+    // ── Qualification (server-side, mirrors the form gate) ──
+    // CAPI must only ever emit qualified leads — Meta optimizes toward whatever
+    // this event describes, browser-side AND server-side.
+    const AGE_LABELS: Record<string, string> = {
+      moins_1an: "Moins d'1 an",
+      "1_3ans": "1 à 3 ans",
+      "3_10ans": "3 à 10 ans",
+      plus_10ans: "Plus de 10 ans",
+    };
+    const CA_LABELS: Record<string, string> = {
+      lt500k: "Moins de 500 000 DH",
+      "500k_2m": "500 000 DH – 2M DH",
+      "2m_10m": "2M – 10M DH",
+      gt10m: "Plus de 10M DH",
+    };
+    const disqualifiers: string[] = [];
+    if (!isCasa) disqualifiers.push("Hors Casablanca");
+    if (companyAge === "moins_1an") disqualifiers.push("Entreprise < 1 an");
+    if (companyCA === "lt500k") disqualifiers.push("CA < 500k DH/an");
+    const isQualified = disqualifiers.length === 0;
 
     if (!fullName || !phone) {
       return NextResponse.json(
@@ -72,8 +94,11 @@ export async function POST(req: NextRequest) {
       try {
         const description = [
           `Lead from Site Inteligent campaign`,
+          `Qualification: ${isQualified ? "QUALIFIÉ" : `NON QUALIFIÉ (${disqualifiers.join(", ")})`}`,
           companyDescription ? `Description: ${companyDescription}` : null,
           `Ville: ${city || "Non renseigné"}`,
+          `Ancienneté: ${AGE_LABELS[companyAge as string] || "Non renseigné"}`,
+          `CA annuel moyen: ${CA_LABELS[companyCA as string] || "Non renseigné"}`,
           `Site existant: ${hasWebsite || "Non renseigné"}`,
           `Délai projet: ${timeline || "Non renseigné"}`,
           `Créneau choisi: ${date || "—"} à ${time || "—"}`,
@@ -149,11 +174,14 @@ export async function POST(req: NextRequest) {
           const endDate = new Date(startDate.getTime() + 20 * 60 * 1000); // 20 min
 
           const eventDescription = [
+            `Qualification: ${isQualified ? "QUALIFIÉ" : `NON QUALIFIÉ (${disqualifiers.join(", ")})`}`,
             `Téléphone: ${phone}`,
             email ? `Email: ${email}` : null,
             company ? `Entreprise: ${company}` : null,
             companyDescription ? `Description: ${companyDescription}` : null,
             city ? `Ville: ${city}` : null,
+            `Ancienneté: ${AGE_LABELS[companyAge as string] || "Non renseigné"}`,
+            `CA annuel moyen: ${CA_LABELS[companyCA as string] || "Non renseigné"}`,
             `Site existant: ${hasWebsite || "Non renseigné"}`,
             `Délai: ${timeline || "Non renseigné"}`,
             (utm_source || utm_medium || utm_campaign || utm_content)
@@ -214,6 +242,9 @@ export async function POST(req: NextRequest) {
             company: company || "",
             companyDescription: companyDescription || "",
             city: city || "",
+            companyAge: AGE_LABELS[companyAge as string] || "",
+            companyCA: CA_LABELS[companyCA as string] || "",
+            qualified: isQualified ? "OUI" : "NON",
             hasWebsite: hasWebsite || "",
             timeline: timeline || "",
             date: date || "",
@@ -232,9 +263,10 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Meta Conversions API (server-side Lead event) ──
-    // Only fire for Casablanca leads — outside-Casa leads enter the CRM/calendar
-    // normally but are kept off the pixel so Facebook keeps optimising for Casa.
-    if (isCasa) {
+    // Only fire for QUALIFIED leads (Casa + entreprise ≥ 1 an + CA ≥ 500k) —
+    // unqualified leads enter the CRM/calendar normally but are kept off the
+    // pixel so Facebook keeps optimising for the leads we actually want.
+    if (isQualified) {
       try {
         const capiResult = await sendCAPIEvent({
           eventName: "Lead",
