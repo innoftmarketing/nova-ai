@@ -233,6 +233,13 @@ function BookingWizard() {
   const [submitting, setSubmitting] = useState(false);
   const [citySegment, setCitySegment] = useState<"casa" | "autre" | null>(null);
   const [otherCity, setOtherCity] = useState("");
+  const [formStep, setFormStep] = useState(1);
+  const [fv, setFv] = useState<Record<string, string>>({});
+  const mirror = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const el = e.target;
+    const value = el.type === "checkbox" ? ((el as HTMLInputElement).checked ? "1" : "") : el.value;
+    setFv((prev) => ({ ...prev, [el.name]: value }));
+  };
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { captureUtmsFromUrl(); }, []);
@@ -524,6 +531,10 @@ function BookingWizard() {
 
   /* ── Step: Form ── */
   if (step === "form") {
+    const s1ok = Boolean(citySegment && (citySegment !== "autre" || otherCity.trim()) && fv.has_website && fv.company_age && fv.company_ca);
+    const s2ok = Boolean((fv.companyDescription || "").trim().length >= 20 && fv.timeline);
+    const s3ok = Boolean((fv.fullName || "").trim() && (fv.phone || "").trim().length >= 9 && (fv.email || "").includes("@") && (fv.company || "").trim() && fv.confirm_rdv);
+    const goStep = (n: number) => { setFormStep(n); setTimeout(scrollToContact, 50); };
     return (
       <div className="max-w-2xl mx-auto relative z-10">
         <div className="bg-surface-container-low rounded-[2.5rem] border border-outline-variant/10 shadow-2xl p-8 lg:p-12">
@@ -543,13 +554,31 @@ function BookingWizard() {
             </span>
           </div>
 
-          <div className="mb-10">
+          <div className="mb-6">
             <h2 className="font-headline text-3xl lg:text-4xl font-bold mb-3 text-on-surface">
               Demander mon Diagnostic Stratégique
             </h2>
             <p className="text-on-surface-variant">
-              Remplissez le formulaire. Un consultant vous contacte pour confirmer.
+              3 petites étapes. Un consultant vous contacte pour confirmer.
             </p>
+          </div>
+
+          {/* Progress bar */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold text-on-surface">
+                {formStep === 1 && "Étape 1/3 — Votre entreprise"}
+                {formStep === 2 && "Étape 2/3 — Votre projet"}
+                {formStep === 3 && "Étape 3/3 — Vos coordonnées"}
+              </span>
+              <span className="text-sm font-bold text-[#0b24fa]">{Math.round((formStep / 3) * 100)}%</span>
+            </div>
+            <div className="h-2 rounded-full bg-[#e9edf9] overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#0b24fa] to-[#2e4bff] transition-all duration-500"
+                style={{ width: `${(formStep / 3) * 100}%` }}
+              />
+            </div>
           </div>
 
           <form
@@ -643,244 +672,188 @@ function BookingWizard() {
               router.push(`${thankYouPath}?${params.toString()}`);
             }}
           >
-            {/* Nom complet */}
-            <div>
-              <label className="block text-sm font-bold text-on-surface mb-2">
-                Nom complet <span className="text-primary-container">*</span>
-              </label>
-              <input
-                name="fullName"
-                className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none"
-                placeholder="Votre nom complet"
-                required
-                type="text"
-              />
-            </div>
-
-            {/* Numéro de téléphone */}
-            <div>
-              <label className="block text-sm font-bold text-on-surface mb-2">
-                Numéro de téléphone <span className="text-primary-container">*</span>
-              </label>
-              <input
-                name="phone"
-                className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none"
-                placeholder="0661 00 00 00"
-                required
-                type="tel"
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-bold text-on-surface mb-2">
-                Adresse email <span className="text-primary-container">*</span>
-              </label>
-              <input
-                name="email"
-                className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none"
-                placeholder="votre@email.com"
-                required
-                type="email"
-              />
-            </div>
-
-            {/* Nom de l'entreprise */}
-            <div>
-              <label className="block text-sm font-bold text-on-surface mb-2">
-                Nom de l&apos;entreprise <span className="text-primary-container">*</span>
-              </label>
-              <input
-                name="company"
-                className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none"
-                placeholder="Nom de votre entreprise"
-                required
-                type="text"
-              />
-            </div>
-
-            {/* Description de l'entreprise */}
-            <div>
-              <label className="block text-sm font-bold text-on-surface mb-2">
-                Décrivez brièvement votre activité <span className="text-primary-container">*</span>
-              </label>
-              <textarea
-                name="companyDescription"
-                className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none resize-none"
-                placeholder="Ex : Nous sommes un salon de coiffure à Casablanca, nous cherchons à attirer plus de clients en ligne..."
-                required
-                rows={3}
-                minLength={50}
-              />
-            </div>
-
-            {/* Ville */}
-            <fieldset>
-              <legend className="block text-sm font-bold text-on-surface mb-3">
-                Ville <span className="text-primary-container">*</span>
-              </legend>
-              <div className="flex gap-4">
-                <label className="flex-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="city_segment"
-                    value="casa"
-                    required
-                    className="peer sr-only"
-                    checked={citySegment === "casa"}
-                    onChange={() => setCitySegment("casa")}
-                  />
-                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">
-                    Casablanca
-                  </div>
-                </label>
-                <label className="flex-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="city_segment"
-                    value="autre"
-                    required
-                    className="peer sr-only"
-                    checked={citySegment === "autre"}
-                    onChange={() => setCitySegment("autre")}
-                  />
-                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">
-                    Autre
-                  </div>
-                </label>
-              </div>
-              {citySegment === "autre" && (
-                <input
-                  name="city_other"
-                  value={otherCity}
-                  onChange={(e) => setOtherCity(e.target.value)}
-                  className="mt-3 w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none"
-                  placeholder="Précisez votre ville"
-                  required
-                  type="text"
-                />
-              )}
-            </fieldset>
-
-            {/* Avez-vous déjà un site web ? */}
-            <fieldset>
-              <legend className="block text-sm font-bold text-on-surface mb-3">
-                Avez-vous déjà un site web ? <span className="text-primary-container">*</span>
-              </legend>
-              <div className="flex gap-4">
-                <label className="flex-1 cursor-pointer">
-                  <input type="radio" name="has_website" value="oui" required className="peer sr-only" />
-                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">
-                    Oui
-                  </div>
-                </label>
-                <label className="flex-1 cursor-pointer">
-                  <input type="radio" name="has_website" value="non" required className="peer sr-only" />
-                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">
-                    Non
-                  </div>
-                </label>
-              </div>
-            </fieldset>
-
-            {/* Ancienneté de l'entreprise */}
-            <fieldset>
-              <legend className="block text-sm font-bold text-on-surface mb-3">
-                Votre entreprise est active depuis <span className="text-primary-container">*</span>
-              </legend>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  ["moins_1an", "Moins d'1 an"],
-                  ["1_3ans", "1 à 3 ans"],
-                  ["3_10ans", "3 à 10 ans"],
-                  ["plus_10ans", "Plus de 10 ans"],
-                ].map(([v, l]) => (
-                  <label key={v} className="cursor-pointer">
-                    <input type="radio" name="company_age" value={v} required className="peer sr-only" />
-                    <div className="py-3 px-2 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">
-                      {l}
-                    </div>
+            {/* ═══ Étape 1 — Votre entreprise (tap only) ═══ */}
+            <div className={formStep === 1 ? "space-y-5" : "hidden"}>
+              {/* Ville */}
+              <fieldset>
+                <legend className="block text-sm font-bold text-on-surface mb-3">
+                  Ville <span className="text-primary-container">*</span>
+                </legend>
+                <div className="flex gap-4">
+                  <label className="flex-1 cursor-pointer">
+                    <input type="radio" name="city_segment" value="casa" className="peer sr-only" checked={citySegment === "casa"} onChange={() => setCitySegment("casa")} />
+                    <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">Casablanca</div>
                   </label>
-                ))}
-              </div>
-            </fieldset>
-
-            {/* Chiffre d'affaires annuel moyen */}
-            <fieldset>
-              <legend className="block text-sm font-bold text-on-surface mb-3">
-                Chiffre d&apos;affaires annuel moyen <span className="text-primary-container">*</span>
-              </legend>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  ["lt500k", "Moins de 500 000 DH"],
-                  ["500k_2m", "500 000 DH – 2M DH"],
-                  ["2m_10m", "2M – 10M DH"],
-                  ["gt10m", "Plus de 10M DH"],
-                ].map(([v, l]) => (
-                  <label key={v} className="cursor-pointer">
-                    <input type="radio" name="company_ca" value={v} required className="peer sr-only" />
-                    <div className="py-3 px-2 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">
-                      {l}
-                    </div>
+                  <label className="flex-1 cursor-pointer">
+                    <input type="radio" name="city_segment" value="autre" className="peer sr-only" checked={citySegment === "autre"} onChange={() => setCitySegment("autre")} />
+                    <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">Autre</div>
                   </label>
-                ))}
+                </div>
+                {citySegment === "autre" && (
+                  <input name="city_other" value={otherCity} onChange={(e) => setOtherCity(e.target.value)} className="mt-3 w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none" placeholder="Précisez votre ville" type="text" />
+                )}
+              </fieldset>
+
+              {/* Site web */}
+              <fieldset>
+                <legend className="block text-sm font-bold text-on-surface mb-3">
+                  Avez-vous déjà un site web ? <span className="text-primary-container">*</span>
+                </legend>
+                <div className="flex gap-4">
+                  <label className="flex-1 cursor-pointer">
+                    <input type="radio" name="has_website" value="oui" onChange={mirror} className="peer sr-only" />
+                    <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">Oui</div>
+                  </label>
+                  <label className="flex-1 cursor-pointer">
+                    <input type="radio" name="has_website" value="non" onChange={mirror} className="peer sr-only" />
+                    <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold">Non</div>
+                  </label>
+                </div>
+              </fieldset>
+
+              {/* Ancienneté */}
+              <fieldset>
+                <legend className="block text-sm font-bold text-on-surface mb-3">
+                  Votre entreprise est active depuis <span className="text-primary-container">*</span>
+                </legend>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    ["moins_1an", "Moins d'1 an"],
+                    ["1_3ans", "1 à 3 ans"],
+                    ["3_10ans", "3 à 10 ans"],
+                    ["plus_10ans", "Plus de 10 ans"],
+                  ].map(([v, l]) => (
+                    <label key={v} className="cursor-pointer">
+                      <input type="radio" name="company_age" value={v} onChange={mirror} className="peer sr-only" />
+                      <div className="py-3 px-2 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">{l}</div>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              {/* CA */}
+              <fieldset>
+                <legend className="block text-sm font-bold text-on-surface mb-3">
+                  Chiffre d&apos;affaires annuel moyen <span className="text-primary-container">*</span>
+                </legend>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    ["lt500k", "Moins de 500 000 DH"],
+                    ["500k_2m", "500 000 DH – 2M DH"],
+                    ["2m_10m", "2M – 10M DH"],
+                    ["gt10m", "Plus de 10M DH"],
+                  ].map(([v, l]) => (
+                    <label key={v} className="cursor-pointer">
+                      <input type="radio" name="company_ca" value={v} onChange={mirror} className="peer sr-only" />
+                      <div className="py-3 px-2 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">{l}</div>
+                    </label>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-on-surface-variant/60">
+                  Ordre de grandeur uniquement — pour préparer un diagnostic pertinent pour votre taille d&apos;entreprise.
+                </p>
+              </fieldset>
+
+              <button type="button" onClick={() => goStep(2)} disabled={!s1ok}
+                className="w-full py-4 mt-2 bg-gradient-to-r from-[#0b24fa] to-[#2e4bff] text-white font-bold rounded-2xl text-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-[0_10px_40px_rgba(36,64,255,0.4)]">
+                Continuer →
+              </button>
+            </div>
+
+            {/* ═══ Étape 2 — Votre projet ═══ */}
+            <div className={formStep === 2 ? "space-y-5" : "hidden"}>
+              <div>
+                <label className="block text-sm font-bold text-on-surface mb-2">
+                  Décrivez brièvement votre activité <span className="text-primary-container">*</span>
+                </label>
+                <textarea name="companyDescription" onChange={mirror} className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none resize-none"
+                  placeholder="Ex : Nous sommes un salon de coiffure à Casablanca, nous cherchons à attirer plus de clients en ligne..."
+                  rows={3} />
               </div>
-              <p className="mt-2 text-xs text-on-surface-variant/60">
-                Ordre de grandeur uniquement — pour préparer un diagnostic pertinent pour votre taille d&apos;entreprise.
+
+              <fieldset>
+                <legend className="block text-sm font-bold text-on-surface mb-3">
+                  Quand souhaitez-vous lancer votre projet ? <span className="text-primary-container">*</span>
+                </legend>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {[
+                    ["asap", "Dès que possible"],
+                    ["few_months", "Dans quelques mois"],
+                    ["exploring", "Je me renseigne"],
+                  ].map(([v, l]) => (
+                    <label key={v} className="flex-1 cursor-pointer">
+                      <input type="radio" name="timeline" value={v} onChange={mirror} className="peer sr-only" />
+                      <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">{l}</div>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <div className="flex gap-3">
+                <button type="button" onClick={() => goStep(1)}
+                  className="px-6 py-4 border-2 border-[#d5daea] bg-white text-[#3a4265] font-bold rounded-2xl hover:border-[#0b24fa]/40 transition-all">
+                  ← Retour
+                </button>
+                <button type="button" onClick={() => goStep(3)} disabled={!s2ok}
+                  className="flex-1 py-4 bg-gradient-to-r from-[#0b24fa] to-[#2e4bff] text-white font-bold rounded-2xl text-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-[0_10px_40px_rgba(36,64,255,0.4)]">
+                  Continuer →
+                </button>
+              </div>
+            </div>
+
+            {/* ═══ Étape 3 — Vos coordonnées ═══ */}
+            <div className={formStep === 3 ? "space-y-5" : "hidden"}>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-on-surface mb-2">
+                    Nom complet <span className="text-primary-container">*</span>
+                  </label>
+                  <input name="fullName" onChange={mirror} className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none" placeholder="Votre nom complet" type="text" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-on-surface mb-2">
+                    Numéro de téléphone <span className="text-primary-container">*</span>
+                  </label>
+                  <input name="phone" onChange={mirror} className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none" placeholder="0661 00 00 00" type="tel" />
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-on-surface mb-2">
+                    Adresse email <span className="text-primary-container">*</span>
+                  </label>
+                  <input name="email" onChange={mirror} className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none" placeholder="votre@email.com" type="email" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-on-surface mb-2">
+                    Nom de l&apos;entreprise <span className="text-primary-container">*</span>
+                  </label>
+                  <input name="company" onChange={mirror} className="w-full bg-white border-2 border-[#d5daea] shadow-sm rounded-xl px-4 py-4 text-on-surface focus:ring-2 focus:ring-[#0b24fa]/25 focus:border-[#0b24fa] transition-all placeholder:text-on-surface-variant/50 outline-none" placeholder="Nom de votre entreprise" type="text" />
+                </div>
+              </div>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" name="confirm_rdv" onChange={mirror}
+                  className="mt-1 h-5 w-5 rounded border-2 border-[#b9c2dd] bg-white text-primary focus:ring-primary accent-primary cursor-pointer shrink-0" />
+                <span className="text-sm text-on-surface-variant leading-relaxed">
+                  Je confirme que je recevrai un appel d&apos;un consultant et je serai au rendez-vous <span className="text-on-surface font-medium">(INCHAALLAH)</span>
+                </span>
+              </label>
+
+              <div className="flex gap-3">
+                <button type="button" onClick={() => goStep(2)}
+                  className="px-6 py-4 border-2 border-[#d5daea] bg-white text-[#3a4265] font-bold rounded-2xl hover:border-[#0b24fa]/40 transition-all">
+                  ← Retour
+                </button>
+                <button type="submit" disabled={submitting || !s3ok}
+                  className={`flex-1 py-4 bg-gradient-to-r from-[#0b24fa] to-[#2e4bff] text-white font-bold rounded-2xl text-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed ${submitting ? "" : "hover:shadow-[0_10px_40px_rgba(36,64,255,0.4)] hover:scale-[1.01] active:scale-95"}`}>
+                  {submitting ? "Envoi en cours..." : "Envoyer ma demande"}
+                </button>
+              </div>
+              <p className="text-center text-xs text-on-surface-variant/60">
+                En envoyant ce formulaire, vous acceptez notre politique de confidentialité.
               </p>
-            </fieldset>
-
-            {/* Quand souhaitez-vous lancer votre projet ? */}
-            <fieldset>
-              <legend className="block text-sm font-bold text-on-surface mb-3">
-                Quand souhaitez-vous lancer votre projet ? <span className="text-primary-container">*</span>
-              </legend>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <label className="flex-1 cursor-pointer">
-                  <input type="radio" name="timeline" value="asap" required className="peer sr-only" />
-                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">
-                    Dès que possible
-                  </div>
-                </label>
-                <label className="flex-1 cursor-pointer">
-                  <input type="radio" name="timeline" value="few_months" required className="peer sr-only" />
-                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">
-                    Dans quelques mois
-                  </div>
-                </label>
-                <label className="flex-1 cursor-pointer">
-                  <input type="radio" name="timeline" value="exploring" required className="peer sr-only" />
-                  <div className="py-3 px-4 text-center border-2 border-[#d5daea] bg-white shadow-sm rounded-xl text-[#3a4265] peer-checked:border-[#0b24fa] peer-checked:text-[#0b24fa] peer-checked:bg-[#0b24fa]/5 peer-checked:shadow-[0_4px_12px_rgba(11,36,250,0.18)] hover:border-[#0b24fa]/40 transition-all font-semibold text-sm">
-                    Je me renseigne
-                  </div>
-                </label>
-              </div>
-            </fieldset>
-
-            {/* Confirmation checkbox */}
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                name="confirm_rdv"
-                required
-                className="mt-1 h-5 w-5 rounded border-2 border-[#b9c2dd] bg-white text-primary focus:ring-primary accent-primary cursor-pointer shrink-0"
-              />
-              <span className="text-sm text-on-surface-variant leading-relaxed">
-                Je confirme que je recevrai un appel d&apos;un consultant et je serai au rendez-vous <span className="text-on-surface font-medium">(INCHAALLAH)</span>
-              </span>
-            </label>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={submitting}
-              className={`w-full py-5 mt-4 bg-gradient-to-r from-[#0b24fa] to-[#2e4bff] text-white font-bold rounded-2xl text-xl transition-all ${submitting ? "opacity-60 cursor-not-allowed" : "hover:shadow-[0_10px_40px_rgba(36,64,255,0.4)] hover:scale-[1.01] active:scale-95"}`}
-            >
-              {submitting ? "Envoi en cours..." : "Envoyer ma demande"}
-            </button>
-            <p className="text-center text-xs text-on-surface-variant/60">
-              En envoyant ce formulaire, vous acceptez notre politique de confidentialité.
-            </p>
+            </div>
           </form>
         </div>
       </div>
