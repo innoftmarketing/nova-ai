@@ -231,6 +231,7 @@ function BookingWizard() {
   // "calendar" | "timeslots" | "form"
   const [step, setStep] = useState<"calendar" | "timeslots" | "form">("calendar");
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [citySegment, setCitySegment] = useState<"casa" | "autre" | null>(null);
   const [otherCity, setOtherCity] = useState("");
   const [formStep, setFormStep] = useState(1);
@@ -587,6 +588,7 @@ function BookingWizard() {
               e.preventDefault();
               if (submitting) return;
               setSubmitting(true);
+              setSubmitError("");
 
               const form = e.currentTarget;
               const formData = new FormData(form);
@@ -606,18 +608,11 @@ function BookingWizard() {
                 ? "Casablanca"
                 : (otherCity.trim() || "Autre");
 
-              // ── Qualification gates ──
-              // The Meta pixel must only ever see qualified leads: once it learns
-              // from unqualified ones, delivery drifts toward more of the same.
+              // Keep qualification answers in the CRM; every saved enquiry is a Lead.
               const companyAge = String(formData.get("company_age") || "");
               const companyCA = String(formData.get("company_ca") || "");
-              const qualified =
-                isCasa &&
-                companyAge !== "moins_1an" &&
-                companyCA !== "lt500k";
-
               try {
-                await fetch("/api/leads", {
+                const response = await fetch("/api/leads", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
@@ -643,35 +638,44 @@ function BookingWizard() {
                     sourceUrl,
                   }),
                 });
+                const result = await response.json();
+                if (!response.ok || result.success !== true) {
+                  throw new Error("Submission failed");
+                }
               } catch {
-                // Still redirect even if API fails
+                setSubmitError("Votre demande n’a pas pu être enregistrée. Veuillez réessayer.");
+                setSubmitting(false);
+                return;
               }
 
               if (
-                qualified &&
                 typeof window !== "undefined" &&
                 typeof window.fbq === "function"
               ) {
-                window.fbq(
-                  "track",
-                  "Lead",
-                  { content_category: language, language },
-                  { eventID: eventId },
-                );
+                try {
+                  window.fbq(
+                    "track",
+                    "Lead",
+                    { content_category: language, language },
+                    { eventID: eventId },
+                  );
+                } catch {
+                  // Tracking must not block confirmation of a saved enquiry.
+                }
               }
 
               const params = new URLSearchParams({
                 date: selectedDateLabel || "",
                 time: selectedTime || "",
               });
-              const thankYouPath = !qualified
-                ? "/merci-autre"
-                : language === "ar"
-                ? "/merci-ar"
-                : "/merci-fr";
-              router.push(`${thankYouPath}?${params.toString()}`);
+              router.push(`/merci?${params.toString()}`);
             }}
           >
+            {submitError && (
+              <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                {submitError}
+              </p>
+            )}
             {/* ═══ Étape 1 — Votre entreprise (tap only) ═══ */}
             <div className={formStep === 1 ? "space-y-5" : "hidden"}>
               {/* Ville */}

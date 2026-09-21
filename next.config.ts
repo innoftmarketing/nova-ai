@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return ["/merci-fr", "/merci-ar", "/merci-autre"].map((source) => ({
+      source,
+      destination: "/merci",
+      permanent: false,
+    }));
+  },
 };
 
 export default nextConfig;

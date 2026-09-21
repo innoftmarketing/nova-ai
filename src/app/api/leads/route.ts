@@ -45,9 +45,8 @@ export async function POST(req: NextRequest) {
       citySegment === "casa" ||
       (typeof city === "string" && city.trim().toLowerCase() === "casablanca");
 
-    // ── Qualification (server-side, mirrors the form gate) ──
-    // CAPI must only ever emit qualified leads — Meta optimizes toward whatever
-    // this event describes, browser-side AND server-side.
+    // Qualification is CRM metadata. Lead tracks every successfully saved enquiry;
+    // the CRM webhook sends QualifiedLead separately after sales qualification.
     const AGE_LABELS: Record<string, string> = {
       moins_1an: "Moins d'1 an",
       "1_3ans": "1 à 3 ans",
@@ -90,7 +89,14 @@ export async function POST(req: NextRequest) {
     const crmUrl = process.env.PERFEX_CRM_URL;
     const crmToken = process.env.PERFEX_CRM_API_TOKEN;
 
-    if (crmUrl && crmToken) {
+    if (!crmUrl || !crmToken) {
+      return NextResponse.json(
+        { error: "Le service est temporairement indisponible. Veuillez réessayer." },
+        { status: 503 },
+      );
+    }
+
+    {
       try {
         const description = [
           `Lead from Site Inteligent campaign`,
@@ -154,11 +160,17 @@ export async function POST(req: NextRequest) {
         if (!crmRes.ok) {
           const errText = await crmRes.text();
           console.error("Perfex CRM error:", crmRes.status, errText);
-          warnings.push("CRM submission failed");
+          return NextResponse.json(
+            { error: "Votre demande n’a pas pu être enregistrée. Veuillez réessayer." },
+            { status: 502 },
+          );
         }
       } catch (err) {
         console.error("Perfex CRM request failed:", err);
-        warnings.push("CRM submission failed");
+        return NextResponse.json(
+          { error: "Votre demande n’a pas pu être enregistrée. Veuillez réessayer." },
+          { status: 502 },
+        );
       }
     }
 
@@ -263,34 +275,30 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Meta Conversions API (server-side Lead event) ──
-    // Only fire for QUALIFIED leads (Casa + entreprise ≥ 1 an + CA ≥ 500k) —
-    // unqualified leads enter the CRM/calendar normally but are kept off the
-    // pixel so Facebook keeps optimising for the leads we actually want.
-    if (isQualified) {
-      try {
-        const capiResult = await sendCAPIEvent({
-          eventName: "Lead",
-          eventId,
-          eventSourceUrl: sourceUrl,
-          email,
-          phone,
-          fullName,
-          city,
-          country: "ma",
-          clientIp,
-          clientUserAgent: userAgent,
-          fbc,
-          fbp,
-          customData: { content_category: lang, language: lang },
-        });
+    // Use the browser's eventId to deduplicate every CRM-saved enquiry.
+    try {
+      const capiResult = await sendCAPIEvent({
+        eventName: "Lead",
+        eventId,
+        eventSourceUrl: sourceUrl,
+        email,
+        phone,
+        fullName,
+        city,
+        country: "ma",
+        clientIp,
+        clientUserAgent: userAgent,
+        fbc,
+        fbp,
+        customData: { content_category: lang, language: lang },
+      });
 
-        if (!capiResult.ok) {
-          warnings.push("Meta CAPI lead event failed");
-        }
-      } catch (err) {
-        console.error("Meta CAPI send failed:", err);
+      if (!capiResult.ok) {
         warnings.push("Meta CAPI lead event failed");
       }
+    } catch (err) {
+      console.error("Meta CAPI send failed:", err);
+      warnings.push("Meta CAPI lead event failed");
     }
 
     if (warnings.length > 0) {
